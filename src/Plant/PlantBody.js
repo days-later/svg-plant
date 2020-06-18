@@ -12,7 +12,6 @@ const prc = v => {
 }
 
 class BranchSegment {
-
     constructor( base, style, n0, n1 ) {
         this.base = base;
 
@@ -112,7 +111,6 @@ class BranchSegment {
 }
 
 class Leaf {
-
     constructor( segment, { angle, length, handles, style, xOffset, yOffset } ) {
         const base = segment.getOffsetPoint( xOffset, yOffset );
         this.base = base;
@@ -250,7 +248,6 @@ class Branches {
 }
 
 class PlantBody {
-
     constructor( genus ) {
         this.genus = genus;
     }
@@ -345,34 +342,21 @@ class PlantBody {
     render( age, colors=true, svg ) {
         age *= this.maxAge;
 
-        if (1 || colors) {
-            for (const p of this.parts) {
-                const points = p.getPoints( age );
-                if (!points) continue;
+        for (const p of this.parts) {
+            const points = p.getPoints( age );
+            if (!points) continue;
 
-                let style = {}, add = {};
+            let style = {}, add = {};
 
-                if (colors) {
-                    style = p.style;
-                    add = {};
-                    if (style['stroke-width']) add['stroke-width'] = prc( style['stroke-width'] );
-                }
-
-                const set = Object.assign( {}, style, add, {
-                    d: html.svg.compilePathDescription( points ),
-                });
-                svg.appendChild( html.svg.node( 'path', set ) );
+            if (colors) {
+                style = p.style;
+                add = {};
+                if (style['stroke-width']) add['stroke-width'] = prc( style['stroke-width'] );
             }
-        }
-        else {
-            let allPoints = [];
-            for (const p of this.parts) {
-                const points = p.getPoints( age );
-                if (points) allPoints = allPoints.concat( points );
-            }
-            const set = {
-                d: html.svg.compilePathDescription( allPoints )
-            };
+
+            const set = Object.assign( {}, style, add, {
+                d: html.svg.compilePathDescription( points ),
+            });
             svg.appendChild( html.svg.node( 'path', set ) );
         }
     }

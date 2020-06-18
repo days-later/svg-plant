@@ -117,12 +117,11 @@ plant.update();                 // updates both
 ```
 
 ### color
-Boolean, Default: true
+Boolean, Default: `true`
 
 Wether the svg includes fill / stroke style attributes.
 `potPathAttr` will only be used if color is enabled.
-If color is disabled, branches and leaves will each be rendered as a single path element.
-Without color the plant looks like a silhouette and you can use css to give it a solid color:
+Without color the plant looks like a silhouette and can be styled with css to give it a solid color:
 
 ```css
 svg.svg-plant {
@@ -131,18 +130,18 @@ svg.svg-plant {
 ```
 
 ### age
-Float [0,1], Default: 1
+Float [0,1], Default: `1`
 
-Age 0 means "Plant has not started to grow."
-Age 1 means "Plant is fully grown."
-All values in between represent a growth stage, eg. .5 - half grown.
+Age `0` means "Plant has not started to grow."
+Age `1` means "Plant is fully grown."
+All values in between represent a growth stage, eg. `.5` - half grown.
 
 ### potSize
-Float [0,1], Default: .3
+Float [0,1], Default: `.3`
 
 The height of the pot in relation to the available height.
-Eg. .3 means 30% of the available height is taken up by the pot, and 70% by the plant.
-0 means no pot will be rendered, 1 means no plant will be rendered.
+Eg. `.3` means 30% of the available height is taken up by the pot, and 70% by the plant.
+`0` means no pot will be rendered, `1` means no plant will be rendered.
 
 ### potPathAttr
 Object, Default: { fill: '#fc7', stroke: '#da5' }

@@ -996,26 +996,24 @@ PlantBody.prototype.render = function render ( age, colors, svg ) {
 
     age *= this.maxAge;
 
-    {
-        for (var i = 0, list = this.parts; i < list.length; i += 1) {
-            var p = list[i];
+    for (var i = 0, list = this.parts; i < list.length; i += 1) {
+        var p = list[i];
 
-                var points = p.getPoints( age );
-            if (!points) { continue; }
+            var points = p.getPoints( age );
+        if (!points) { continue; }
 
-            var style = {}, add = {};
+        var style = {}, add = {};
 
-            if (colors) {
-                style = p.style;
-                add = {};
-                if (style['stroke-width']) { add['stroke-width'] = prc( style['stroke-width'] ); }
-            }
-
-            var set = Object.assign( {}, style, add, {
-                d: html.svg.compilePathDescription( points ),
-            });
-            svg.appendChild( html.svg.node( 'path', set ) );
+        if (colors) {
+            style = p.style;
+            add = {};
+            if (style['stroke-width']) { add['stroke-width'] = prc( style['stroke-width'] ); }
         }
+
+        var set = Object.assign( {}, style, add, {
+            d: html.svg.compilePathDescription( points ),
+        });
+        svg.appendChild( html.svg.node( 'path', set ) );
     }
 };
 
