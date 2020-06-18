@@ -42,8 +42,7 @@ class DragonTreeGenus extends BaseGenus {
 
         const p = .75;
         const steps = { from: -60, to: 60, step: 30 };
-
-        return plantHelper.repeat( this.rng, steps, p, angle => {
+        const offshoots = plantHelper.repeat( this.rng, steps, p, angle => {
             return {
                 n: 2,
                 attr: {
@@ -51,6 +50,15 @@ class DragonTreeGenus extends BaseGenus {
                 }
             };
         });
+
+        if (!offshoots.length) offshoots.push({
+            n: 2,
+            attr: {
+                segmentAngle: this.rng.range( -60, 60 ),
+            }
+        });
+
+        return offshoots;
     }
 
     getNodeWidth( pos, prev, _attr ) {

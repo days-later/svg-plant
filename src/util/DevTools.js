@@ -37,7 +37,7 @@ const testPlantBodySize = (genus, n=1000) => {
     };
 };
 
-const findSeed = (genus, test, timeoutMs=30*1000) => {
+const findSeed = (genus, test, timeoutMs=10*1000) => {
     let cancel = false, n = 0, seed;
     const t0 = Date.now();
 
@@ -72,12 +72,11 @@ const findSeed = (genus, test, timeoutMs=30*1000) => {
     return seed;
 };
 
-const testPerformance = (genus, durationMs) => {
+const testPerformance = (genus, durationMs=10*1000) => {
     const t0 = Date.now();
     let n = 0;
 
     while (true) {
-
         const p = (new SvgPlant( new genus )).body;
         p.genus.width = 0;
         p.genus.height = 0;

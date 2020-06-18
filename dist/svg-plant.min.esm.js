@@ -1537,8 +1537,7 @@ var DragonTreeGenus = /*@__PURE__*/(function (BaseGenus) {
 
         var p = .75;
         var steps = { from: -60, to: 60, step: 30 };
-
-        return plantHelper.repeat( this.rng, steps, p, function (angle) {
+        var offshoots = plantHelper.repeat( this.rng, steps, p, function (angle) {
             return {
                 n: 2,
                 attr: {
@@ -1546,6 +1545,15 @@ var DragonTreeGenus = /*@__PURE__*/(function (BaseGenus) {
                 }
             };
         });
+
+        if (!offshoots.length) { offshoots.push({
+            n: 2,
+            attr: {
+                segmentAngle: this.rng.range( -60, 60 ),
+            }
+        }); }
+
+        return offshoots;
     };
 
     DragonTreeGenus.prototype.getNodeWidth = function getNodeWidth ( pos, prev, _attr ) {
@@ -1838,7 +1846,7 @@ var testPlantBodySize = function (genus, n) {
 };
 
 var findSeed = function (genus, test, timeoutMs) {
-    if ( timeoutMs === void 0 ) timeoutMs=30*1000;
+    if ( timeoutMs === void 0 ) timeoutMs=10*1000;
 
     var cancel = false, n = 0, seed;
     var t0 = Date.now();
@@ -1874,11 +1882,12 @@ var findSeed = function (genus, test, timeoutMs) {
 };
 
 var testPerformance = function (genus, durationMs) {
+    if ( durationMs === void 0 ) durationMs=10*1000;
+
     var t0 = Date.now();
     var n = 0;
 
     while (true) {
-
         var p = (new SvgPlant( new genus )).body;
         p.genus.width = 0;
         p.genus.height = 0;

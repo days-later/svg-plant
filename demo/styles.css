@@ -3,6 +3,9 @@ html {
     font: 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     color: #444;
 }
+* {
+    box-sizing: border-box;
+}
 
 body {
     display: flex;
@@ -18,20 +21,11 @@ body.dark {
     background: #555;
 }
 
-#seed {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-
-    color: rgba(0,0,0,0.5);
-
-    user-select: all;
-}
-
 #plant {
     position: relative;
     height: calc(100% - 130px);
     margin: 20px 20px 0;
+    overflow: hidden;
 }
 #plant > svg {
     position: absolute;
@@ -52,6 +46,12 @@ body.dark {
 }
 
 #controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+
     display: flex;
     justify-content: center;
     align-items: stretch;
@@ -129,4 +129,95 @@ body.dark #controls > div:hover > svg, body.dark #controls > div:hover > span {
 body.dark #controls > div.inactive > svg, body.dark #controls > div.inactive > span {
     fill: #666;
     color: #666;
+}
+
+#tools {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 110px;
+    z-index: 9;
+
+    transition: bottom .5s;
+}
+#tools.off {
+    bottom: -100%;
+}
+#tools > div {
+    width: 500px;
+    max-width: 100%;
+    max-height: calc(100vh - 110px);
+    margin: 0 auto;
+    padding: 20px 20px 10px;
+
+    overflow: hidden;
+    overflow-y: auto;
+
+    background: #f4f4f4;
+}
+#tools > div > div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding: 0 0 10px;
+}
+#tools > div > div + div {
+    padding-top: 0;
+}
+#tools .full { flex: 0 0 100%; }
+#tools > div > div > * { flex: 0 0 auto }
+#tools .grow { flex: 1 1 auto }
+#tools .gl { margin-left: 10px; }
+#tools .gt { margin-top: 10px; }
+#tools .gr { margin-right: 10px; }
+#tools .gb { margin-bottom: 10px; }
+
+#tools label {
+    font-size: 10px;
+    line-height: 1;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+#tools input {
+    width: 100px;
+    height: 32px;
+    padding: 6px;
+    font-size: 20px;
+}
+#tools .btn {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    height: 32px;
+    min-width: 40px;
+    padding: 4px 8px;
+
+    font-size: 10px;
+    line-height: 1;
+    font-weight: bold;
+    text-transform: uppercase;
+
+    background: #eee;
+}
+#tools .btn:hover {
+    cursor: pointer;
+    color: #fff;
+    fill: #fff;
+    background: #444;
+}
+
+body.dark #tools > div {
+    background: #333;
+    color: #fff;
+}
+body.dark #tools .btn {
+    background: #222;
+}
+body.dark #tools .btn:hover {
+    background: #111;
 }

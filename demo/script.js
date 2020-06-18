@@ -36,10 +36,14 @@ function load() {
 load();
 
 const plantEl = document.getElementById( 'plant' );
+const toolsEl = document.getElementById( 'tools' );
+const genusEl = document.getElementById( 'genus' );
+const seedEl = document.getElementById( 'seed' );
+
 const colorBtn = document.querySelector( '.btn.color' );
+const toolsBtn = document.querySelector( '.btn.tools' );
 const prevBtn = document.querySelector( '.btn.prev' );
 const nextBtn = document.querySelector( '.btn.next' );
-const seedEl = document.getElementById( 'seed' );
 
 function removePlants() {
     if (!animationDir) {
@@ -108,19 +112,22 @@ function update() {
 
     seeds[ genus ] = plant.seed;
     seedEl.innerHTML = plant.seed;
+    genusEl.innerHTML = genera[ genus ].genusName;
 
     save();
 }
 update();
 
-function shuffle() {
-    seeds[ genus ] = undefined;
+function setSeed( seed ) {
+    seeds[ genus ] = seed;
     animationDir = false;
     update();
-
     plant.animate( 0, 1, 500 );
 }
-document.querySelector( '.btn.shuffle' ).addEventListener( 'click', shuffle, { passive: true });
+document.querySelector( '.btn.shuffle' ).addEventListener( 'click', () => {
+    setSeed( undefined );
+    hideTools();
+}, { passive: true });
 
 function hsl2rgb( h, s, l ) {
     let c = (1 - Math.abs(2 * l - 1)) * s,
@@ -155,6 +162,7 @@ function toggleColor() {
     if (!color) fill = hsl2rgb( Math.random() * 360, .5, .8 );
     animationDir = false;
     update();
+    hideTools();
 }
 colorBtn.addEventListener( 'click', toggleColor, { passive: true });
 
@@ -163,6 +171,7 @@ function prev() {
     genus--;
     animationDir = 'right';
     update();
+    hideTools();
 }
 prevBtn.addEventListener( 'click', prev, { passive: true });
 function next() {
@@ -170,12 +179,11 @@ function next() {
     genus++;
     animationDir = 'left';
     update();
+    hideTools();
 }
 nextBtn.addEventListener( 'click', next, { passive: true });
 
-
 function setAge( e, bb ) {
-    console.log( 's' );
     const y = e.clientY;
     const pad = .2;
     plant.age = 1 - (y - (bb.y + bb.height*pad)) / (bb.height * (1 - pad * 2));
@@ -207,4 +215,34 @@ plantEl.addEventListener( 'touchstart', e => {
     window.addEventListener( 'touchend', cancel );
 
     setAge( e.changedTouches[ 0 ], bb );
+});
+
+toolsBtn.addEventListener( 'click', () => {
+    toolsEl.classList.toggle( 'off' );
+    toolsBtn.classList.toggle( 'on' );
+    toolsBtn.classList.toggle( 'off' );
+}, { passive: true });
+function hideTools() {
+    toolsEl.classList.add( 'off' );
+    toolsBtn.classList.add( 'on' );
+    toolsBtn.classList.remove( 'off' );
+}
+
+function copySeedToClipboard() {
+    const i = document.createElement( 'input' );
+    i.type = 'text';
+    i.value = seeds[ genus ];
+    document.body.appendChild( i );
+    i.select();
+    document.execCommand("copy");
+    i.remove();
+}
+document.querySelector( '.btn.copy-seed' ).addEventListener( 'click', copySeedToClipboard );
+
+const seedInput = document.getElementById( 'seed-input' );
+document.querySelector( '.btn.set-seed' ).addEventListener( 'click', () => {
+    if (seedInput.value === "") return;
+    setSeed( seedInput.value );
+    seedInput.value = "";
+    hideTools();
 });

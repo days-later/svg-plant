@@ -1,6 +1,6 @@
 # 🌿 SvgPlant
 
-![Example 1](demo/Example1.svg?sanitize=true)
+![Example 1](demo/Example1.svg)
 ![Example 2](demo/Example2.svg)
 
 A library that lets you generate images of different types of plants as svg elements.
