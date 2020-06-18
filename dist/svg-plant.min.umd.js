@@ -279,6 +279,7 @@
 	    svg: {
 	        root: function root( set ) {
 	            var svg = html.svg.node( 'svg', set );
+	            svg.setAttribute( 'xmlns', "http://www.w3.org/2000/svg" );
 	            svg.setAttributeNS( "http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink" );
 	            return svg;
 	        },

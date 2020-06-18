@@ -2,6 +2,8 @@
 
 ![Example 1](demo/Example1.svg)
 ![Example 2](demo/Example2.svg)
+![Example 3](demo/Example3.svg)
+![Example 4](demo/Example4.svg)
 
 A library that lets you generate images of different types of plants as svg elements.
 

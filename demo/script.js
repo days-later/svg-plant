@@ -236,6 +236,8 @@ function copySeedToClipboard() {
     i.select();
     document.execCommand("copy");
     i.remove();
+
+    hideTools();
 }
 document.querySelector( '.btn.copy-seed' ).addEventListener( 'click', copySeedToClipboard );
 
@@ -246,3 +248,15 @@ document.querySelector( '.btn.set-seed' ).addEventListener( 'click', () => {
     seedInput.value = "";
     hideTools();
 });
+
+function copySvgToClipboard() {
+    const i = document.createElement( 'textarea' );
+    i.innerText = plant.svgElement.outerHTML;
+    document.body.appendChild( i );
+    i.select();
+    document.execCommand("copy");
+    i.remove();
+
+    hideTools();
+}
+document.querySelector( '.btn.copy-svg' ).addEventListener( 'click', copySvgToClipboard );
