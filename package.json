@@ -1,0 +1,38 @@
+{
+  "name": "svg-plant",
+  "version": "1.0.0",
+  "description": "procedurally generated svg graphic of a houseplant",
+  "author": "fridtjof@gmail.com",
+  "license": "MIT",
+  "src": "dist/svg-plant.esm.js",
+  "main": "dist/svg-plant.min.cjs.js",
+  "module": "dist/svg-plant.min.esm.js",
+  "browser": "dist/svg-plant.min.umd.js",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "plant",
+    "flower",
+    "tree",
+    "javascript",
+    "svg",
+    "procedural",
+    "generation"
+  ],
+  "scripts": {
+    "build": "set NODE_ENV=production&& rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "dependencies": {
+    "random-seed": "^0.3.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.3",
+    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-node-resolve": "^8.0.1",
+    "rollup": "^2.15.0",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-terser": "^6.1.0"
+  }
+}
