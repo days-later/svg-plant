@@ -9,6 +9,7 @@ A library that lets you generate images of different types of plants as svg elem
 
 [Demo](https://htmlpreview.github.io/?https://github.com/days-later/svg-plant/blob/main/demo/demo.html)
 
+
 ## Install
 
 Install with npm:
@@ -22,6 +23,7 @@ Load with script tag:
 ```html
 <script src="https://unpkg.com/svg-plant@1.0.0/dist/svg-plant.min.umd.js"></script>
 ```
+
 
 ## Usage
 
@@ -51,6 +53,7 @@ If you used the script tag to include the library, a global `SvgPlant` object is
 </script>
 ```
 
+
 ## Genera
 
 This library calls the different types of plants "Genera."
@@ -71,6 +74,7 @@ If you only need specific genera, its better to only import those:
 ```js
 import { BushyPlantGenus, ZamiaGenus } from 'svg-plant';
 ```
+
 
 ## Configuration
 
@@ -148,10 +152,32 @@ Can contain any valid &lt;path/> attributes. It is best to use this setting to s
 Because stroke-width will be taken into account to determine the size of the pot to avoid clipping.
 If no stroke-width is supplied, 2 will be set. This setting is only used if `color` is enabled.
 
+
 # Animation
 
-Todo
+```js
+import { SvgPlant, PileaGenus } from 'svg-plant';
+
+const genus = new PileaGenus();
+const plant = new SvgPlant( genus );
+
+const svg = plant.svgElement;
+document.body.appendChild( svg );
+
+// animate from age 0 to age 1 in 3 seconds
+plant.animate( 0, 1, 3000 );
+
+plant.pauseAnimation();
+plant.resumeAnimation();
+plant.cancelAnimation();
+```
+
 
 # Custom Genera
 
-Todo
+Todo. Let me know if you are interested in some directions on how to create new genera.
+
+
+# License
+
+MIT
