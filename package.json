@@ -20,6 +20,14 @@
     "procedural",
     "generation"
   ],
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/days-later/svg-plant.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/days-later/svg-plant/issues",
+    "email" : "fridtjof@gmail.com"
+  },
   "scripts": {
     "build": "set NODE_ENV=production&& rollup -c",
     "dev": "rollup -c -w"
