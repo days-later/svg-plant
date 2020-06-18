@@ -1,4 +1,4 @@
-# 🌿 SvgPlant
+# SvgPlant
 
 ![Example 1](demo/Example1.svg)
 ![Example 2](demo/Example2.svg)
