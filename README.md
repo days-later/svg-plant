@@ -5,7 +5,7 @@
 
 A library that lets you generate images of different types of plants as svg elements.
 
-[Demo](https://htmlpreview.github.io/?https://github.com/days-later/svg-plant/blob/main/demo/demo.html)
+<a href="https://htmlpreview.github.io/?https://github.com/days-later/svg-plant/blob/main/demo/demo.html" target="_blank">Demo</a>
 
 ## Install
 
