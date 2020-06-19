@@ -112,7 +112,9 @@ var math = {
     },
 
     distance: function distance( p1, p2 ) {
-        return Math.sqrt( Math.pow( (p1[0]-p2[0]), 2 ) + Math.pow( (p1[1]-p2[1]), 2 ) );
+        var dx = p1[0] - p2[0];
+        var dy = p1[1] - p2[1];
+        return Math.sqrt( dx*dx + dy*dy );
     }
 };
 

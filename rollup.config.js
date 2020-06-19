@@ -1,4 +1,5 @@
 
+import { eslint } from "rollup-plugin-eslint";
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import buble from '@rollup/plugin-buble';
@@ -37,27 +38,31 @@ export default [
     // CommonJS (for Node) and ES module (for bundlers) build.
     {
         input: 'src/main.js',
-        external: [
-            'random-seed'
-        ],
         output: [
             { file: pkg.main, format: 'cjs', sourcemap: true },
             { file: pkg.module, format: 'es', sourcemap: true }
         ],
-        external: Object.keys( pkg.dependencies ),
         plugins: [
             buble( bubleCfg ),
-            isProduction && terser(),
-        ]
+        ],
+        external: Object.keys( pkg.dependencies ),
     },
 
     // src: unminified, untranspiled
     {
         input: 'src/main.js',
-        external: Object.keys( pkg.dependencies ),
         output: {
             file: pkg.src,
             format: 'es'
-        }
-    }
+        },
+        plugins: [
+            eslint({
+                exclude: 'node_modules/**',
+                throwOnError: true,
+                throwOnWarning: true,
+                formatter: 'table',
+            }),
+        ],
+        external: Object.keys( pkg.dependencies ),
+    },
 ];

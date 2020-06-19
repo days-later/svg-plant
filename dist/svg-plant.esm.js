@@ -94,7 +94,9 @@ const math = {
     },
 
     distance( p1, p2 ) {
-        return Math.sqrt( (p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 );
+        const dx = p1[0] - p2[0];
+        const dy = p1[1] - p2[1];
+        return Math.sqrt( dx*dx + dy*dy );
     }
 };
 
