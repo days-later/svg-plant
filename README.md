@@ -21,7 +21,7 @@ npm install --save svg-plant
 Load with script tag:
 
 ```html
-<script src="https://unpkg.com/svg-plant@1.0.0/dist/svg-plant.min.umd.js"></script>
+<script src="https://unpkg.com/svg-plant@1.0.1/dist/svg-plant.min.umd.js"></script>
 ```
 
 
