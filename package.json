@@ -1,13 +1,13 @@
 {
   "name": "svg-plant",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "procedurally generated svg graphic of a houseplant",
   "author": "fridtjof@gmail.com",
   "license": "MIT",
   "main": "dist/svg-plant.cjs.js",
   "module": "dist/svg-plant.esm.js",
   "browser": "dist/svg-plant.min.umd.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/types/main.d.ts",
   "sideEffects": false,
   "files": [
     "dist"
