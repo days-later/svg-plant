@@ -1,9 +1,10 @@
 import { BaseGenus } from "./BaseGenus";
-import { plantHelper } from "../util/util";
+import { plantHelper, node, offshoot, nodePos, nodeAttr } from "../util/util";
+import { Genus, rngSeed, leafDefinition } from '../types';
 
-class DragonTreeGenus extends BaseGenus {
+class DragonTreeGenus extends BaseGenus implements Genus {
 
-    constructor( rngSeed ) {
+    constructor( rngSeed?: rngSeed ) {
         super( rngSeed );
 
         this.width = 10.3;
@@ -37,19 +38,20 @@ class DragonTreeGenus extends BaseGenus {
             },
         ];
     }
-    getOffshoots( node ) {
+    getOffshoots( node: node ) {
         if (!node.pos.isLast) return [];
 
         const p = .75;
         const steps = { from: -60, to: 60, step: 30 };
-        const offshoots = plantHelper.repeat( this.rng, steps, p, angle => {
+        const makeOffshoot = (angle: number): offshoot => {
             return {
                 n: 2,
                 attr: {
                     segmentAngle: node.attr.angle + angle + this.rng.range( -10, 10 ),
                 }
             };
-        });
+        };
+        const offshoots = plantHelper.repeat({ rng: this.rng, steps, p, cb: makeOffshoot });
 
         if (!offshoots.length) offshoots.push({
             n: 2,
@@ -61,27 +63,29 @@ class DragonTreeGenus extends BaseGenus {
         return offshoots;
     }
 
-    getNodeWidth( pos, prev, _attr ) {
+    getNodeWidth( pos: nodePos, prev: node, _attr: nodeAttr ) {
         if (pos.isOffshoot && prev) return prev.attr.width;
         if (pos.branchNum == 1) return this.rng.range( .2, .3 );
         return this.rng.range( .4, .6 );
     }
-    getSegmentLength( pos, _prev, _attr ) {
+    getSegmentLength( pos: nodePos, _prev: node, _attr: nodeAttr ) {
         if (pos.branchNum == 1) return this.rng.range( .2, .8 );
         return this.rng.range( .5, 1.5 );
     }
-    getSegmentAngle( pos, prev, _attr ) {
+    getSegmentAngle( pos: nodePos, prev: node, _attr: nodeAttr ) {
         return plantHelper.nextAngle( this.rng, pos, prev, 8, true );
     }
 
-    getSegmentStyle( _node0, _node1 ) {
+    getSegmentStyle( _n0: node, _n1: node ) {
         return this.segmentStyle;
     }
 
-    getLeaves( _n0, n1 ) {
+    getLeaves( _n0: node, n1: node ) {
         if (!n1.pos.isLast || n1.pos.branchNum != 1) return [];
 
-        return plantHelper.repeat( this.rng, { from: -75, to: 75, step: 10 }, .5, angle => {
+        const steps = { from: -75, to: 75, step: 10 };
+        const p = .5;
+        const makeLeaf = (angle: number): leafDefinition => {
             const av = this.rng.range( -5, 5 );
             const sv = this.rng.range( -.7, .7 );
 
@@ -94,7 +98,8 @@ class DragonTreeGenus extends BaseGenus {
                 xOffset: this.rng.range( -.2, .2 ),
                 yOffset: this.rng.range( .8, .95 ),
             };
-        });
+        };
+        return plantHelper.repeat({ rng: this.rng, steps, p, cb: makeLeaf });
     }
 };
 

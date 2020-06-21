@@ -1,60 +1,103 @@
 import { plantPotSvg } from "./plantPotSvg";
 import { PlantBody } from "./PlantBody";
 import { html } from "../util/util";
+import { attributeSet, Genus } from '../types';
+
+interface SvgPlantCfg {
+    color: boolean,
+    age: number,
+    potSize: number,
+    potPathAttr: attributeSet,
+};
+interface SvgPlantCfgArg {
+    color?: boolean,
+    age?: number,
+    potSize?: number,
+    potPathAttr?: attributeSet,
+};
+
+interface PlantAnimation {
+    fromAge: number,
+    toAge: number,
+    ageSpan: number,
+    currentAge: number,
+
+    durationMs: number,
+
+    nextAnimationFrame: undefined | number,
+
+    paused: boolean,
+};
 
 class SvgPlant {
+    body: PlantBody;
+    private cfg: SvgPlantCfg;
 
-    constructor( genus, cfg ) {
-        this._cfg = {
+    private _svgElement: SVGElement | null;
+    private _potSvgElement: SVGElement | null;
+    private _bodySvgElement: SVGElement | null;
+
+    private animation: PlantAnimation | null;
+
+    constructor( genus: Genus, cfg?: SvgPlantCfgArg ) {
+        this.cfg = {
             color: true,
             age: 1,
             potSize: .3,
             potPathAttr: { fill: '#fc7', stroke: '#da5' },
         };
+
         if (typeof cfg == 'object') {
-            for (let key in this._cfg) {
-                if (key in cfg) this[ key ] = cfg[ key ];
-            }
+            if (cfg.color !== undefined) this.color = cfg.color;
+            if (cfg.age !== undefined) this.age = cfg.age;
+            if (cfg.potSize !== undefined) this.potSize = cfg.potSize;
+            if (cfg.potPathAttr !== undefined) this.potPathAttr = cfg.potPathAttr;
         }
 
         this.body = new PlantBody( genus );
+
+        this._svgElement = null;
+        this._potSvgElement = null;
+        this._bodySvgElement = null;
+
+        this.animation = null;
     }
 
-    get seed() {
+    get seed(): string {
         return this.body.genus.rngSeed;
     }
 
-    get color() { return this._cfg.color; }
-    set color( v ) {
+    get color(): boolean { return this.cfg.color; }
+    set color( v: boolean ) {
         v = !!v;
-        if (v != this._cfg.color) {
-            this._cfg.color = v;
+        if (v != this.cfg.color) {
+            this.cfg.color = v;
             this.update();
         }
     }
 
-    get age() { return this._cfg.age; }
-    set age( v ) {
+    get age(): number { return this.cfg.age; }
+    set age( v: number ) {
         v = Math.max( 0, Math.min( v, 1 ));
-        if (v != this._cfg.age) {
-            this._cfg.age = v;
+        if (v != this.cfg.age) {
+            this.cfg.age = v;
             this.update( true, false );
         }
     }
 
-    get potSize() { return this._cfg.potSize; }
-    set potSize( v ) {
+    get potSize(): number { return this.cfg.potSize; }
+    set potSize( v: number ) {
         v = Math.max( 0, Math.min( v, 1 ));
-        if (v != this._cfg.potSize) {
-            this._cfg.potSize = v;
+        if (v != this.cfg.potSize) {
+            this.cfg.potSize = v;
             this.update( false, true );
         }
     }
 
-    get potPathAttr() { return this._cfg.potPathAttr; }
-    set potPathAttr( v ) {
-        if (v != this._cfg.potPathAttr) {
-            this._cfg.potPathAttr = v;
+    get potPathAttr(): attributeSet { return this.cfg.potPathAttr; }
+    set potPathAttr( v: attributeSet ) {
+        if (v !== this.cfg.potPathAttr) {
+            this.cfg.potPathAttr = v;
             this.update( false, true );
         }
     }
@@ -65,54 +108,54 @@ class SvgPlant {
         this.updateSvgElement();
     }
 
-    get svgElement() {
+    get svgElement(): SVGElement {
         if (!this._svgElement) {
             this._svgElement = this.getSvgElement();
         }
         return this._svgElement;
     }
-    updateSvgElement() {
+    updateSvgElement(): void {
         const svg = this._svgElement;
         if (!svg) return;
 
         svg.innerHTML = this.getSvgElement().innerHTML;
     }
-    getSvgElement() {
+    getSvgElement(): SVGElement {
         const svg = html.svg.root({
             class: 'svg-plant',
             viewBox: '0 0 1 1',
             preserveAspectRatio: 'xMidYMax meet',
         });
 
-        const place = ( el, x, y, w, h ) => {
-            el.setAttribute( 'x', x );
-            el.setAttribute( 'y', y );
-            el.setAttribute( 'width', w );
-            el.setAttribute( 'height', h );
+        const place = ( el: Element, x: number, y: number, w: number, h: number ) => {
+            el.setAttribute( 'x', String( x ) );
+            el.setAttribute( 'y', String( y ) );
+            el.setAttribute( 'width', String( w ) );
+            el.setAttribute( 'height', String( h ) );
         };
 
         const pot = this.potSvgElement;
         const body = this.bodySvgElement;
 
-        if (this._cfg.potSize >= 1) {
+        if (this.cfg.potSize >= 1 && pot !== null) {
             svg.appendChild( pot );
             place( pot, 0, 0, 1, 1 );
         }
-        else if (this._cfg.potSize <= 0) {
+        else if (this.cfg.potSize <= 0 && body !== null) {
             svg.appendChild( body );
             place( body, 0, 0, 1, 1 );
         }
-        else {
+        else if (pot && body) {
             svg.appendChild( pot );
-            place( pot, 0, 1 - this._cfg.potSize, 1, this._cfg.potSize );
+            place( pot, 0, 1 - this.cfg.potSize, 1, this.cfg.potSize );
             svg.appendChild( body );
 
             // with high contrast there is a slight gap visible, between pot and plant.
             // without color this is way more noticable, and the slight overlap is invisible.
-            const overlap = this._cfg.color ? 0 : .001;
+            const overlap = this.cfg.color ? 0 : .001;
 
             let height;
-            const bodyHeight = 1 - this._cfg.potSize;
+            const bodyHeight = 1 - this.cfg.potSize;
 
             if (this.body.yFactor > 1) {
                 // this means the plant has points "below the fold"
@@ -144,35 +187,35 @@ class SvgPlant {
         return svg;
     }
 
-    get potSvgElement() {
-        if (this._cfg.potSize == 0) return null;
+    get potSvgElement(): SVGElement | null {
+        if (this.cfg.potSize == 0) return null;
 
         if (!this._potSvgElement) {
             this._potSvgElement = this.getPotSvgElement();
         }
         return this._potSvgElement;
     }
-    getPotSvgElement() {
-        if (!this._cfg.color) return plantPotSvg();
-        return plantPotSvg( this._cfg.potPathAttr );
+    getPotSvgElement(): SVGElement {
+        if (!this.cfg.color) return plantPotSvg({});
+        return plantPotSvg( this.cfg.potPathAttr );
     }
 
-    get bodySvgElement() {
-        if (this._cfg.potSize == 1) return null;
+    get bodySvgElement(): SVGElement | null {
+        if (this.cfg.potSize == 1) return null;
 
         if (!this._bodySvgElement) {
             this._bodySvgElement = this.getBodySvgElement();
         }
         return this._bodySvgElement;
     }
-    getBodySvgElement() {
-        return this.body.getSvg( this._cfg.age, this._cfg.color );
+    getBodySvgElement(): SVGElement {
+        return this.body.getSvg( this.cfg.age, this.cfg.color );
     }
 
     animate( fromAge=0, toAge=1, durationMs=3000 ) {
         this.cancelAnimation();
 
-        this._animation = {
+        this.animation = {
             fromAge,
             toAge,
             ageSpan: toAge - fromAge,
@@ -188,27 +231,29 @@ class SvgPlant {
         this.resumeAnimation();
     }
     pauseAnimation() {
-        if (this._animation) {
-            cancelAnimationFrame( this._animation.nextAnimationFrame );
-            this._animation.paused = true;
+        if (this.animation) {
+            if (this.animation.nextAnimationFrame !== undefined) {
+                cancelAnimationFrame( this.animation.nextAnimationFrame );
+            }
+            this.animation.paused = true;
         }
     }
     cancelAnimation() {
         this.pauseAnimation();
-        this._animation = null;
+        this.animation = null;
     }
     resumeAnimation() {
-        const a = this._animation;
+        const a = this.animation;
         if (!a || !a.paused) return;
         a.paused = false;
 
         this.age = a.currentAge;
 
-        const acl = t => t<0 ? 0 : t>1 ? 1 : Math.sin( (t - .5) * Math.PI ) * .5 + .5;
-        const aclInv = t => t<0 ? 0 : t>1 ? 1 : Math.asin( t * 2 - 1 ) / Math.PI + .5;
+        const acl = (t: number): number => t<0 ? 0 : t>1 ? 1 : Math.sin( (t - .5) * Math.PI ) * .5 + .5;
+        const aclInv = (t: number): number => t<0 ? 0 : t>1 ? 1 : Math.asin( t * 2 - 1 ) / Math.PI + .5;
 
-        let t0;
-        const upd = ts => {
+        let t0: number;
+        const upd = (ts: number) => {
             if (!t0) {
                 const f = (a.currentAge - a.fromAge) / a.ageSpan;
                 t0 = ts - aclInv( f ) * a.durationMs;
@@ -218,8 +263,8 @@ class SvgPlant {
                 const f = acl( Math.min( 1, (ts - t0) / a.durationMs ) );
 
                 if (f < 1) {
-                    this._cfg.age = a.fromAge + f * a.ageSpan;
-                    a.currentAge = this._cfg.age;
+                    this.cfg.age = a.fromAge + f * a.ageSpan;
+                    a.currentAge = this.cfg.age;
 
                     this._bodySvgElement = null;
                     this.updateSvgElement();
@@ -228,7 +273,7 @@ class SvgPlant {
                 }
                 else {
                     this.age = a.toAge;
-                    this._animation = null;
+                    this.animation = null;
                 }
             }
         };

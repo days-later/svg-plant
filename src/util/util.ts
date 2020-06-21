@@ -1,45 +1,35 @@
-import RNG from 'random-seed';
+import seedrandom from 'seedrandom';
+import { attributeSet, pathDescriptionSegment, point, rngSeed } from '../types';
 
 const html = {
-    node( tag, set ) {
+    node( tag: string, set?: attributeSet ): Element {
         const node = document.createElement( tag );
         html.attr( node, set );
         return node;
     },
-    nodeNS( tag, set, ns ) {
+    nodeNS( tag: string, set: attributeSet, ns: string ): Element {
         const node = document.createElementNS( ns, tag );
         html.attr( node, set );
         return node;
     },
-    attr( node, set ) {
-        for (let name in set) node.setAttribute( name, set[ name ] );
+    attr( node: Element, set: attributeSet = {} ): void {
+        for (let name in set) node.setAttribute( name, String( set[ name ] ) );
     },
 
     svg: {
-        root( set ) {
-            const svg = html.svg.node( 'svg', set );
+        root( set?: attributeSet ): SVGElement {
+            const svg = <SVGElement>html.svg.node( 'svg', set );
             svg.setAttribute( 'xmlns', "http://www.w3.org/2000/svg" );
             svg.setAttributeNS( "http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink" );
             return svg;
         },
-        node( tag, set ) {
-            const el = html.nodeNS( tag, {}, "http://www.w3.org/2000/svg" );
+        node( tag: string, set?: attributeSet ): SVGElement {
+            const el = <SVGElement>html.nodeNS( tag, {}, "http://www.w3.org/2000/svg" );
             html.attr( el, set );
             return el;
         },
-        stroke({ color='#000', w=1, opacity=1, cap='square', join='miter', dash='', nss=false },set={}) {
-            set['stroke'] = color;
-            set['stroke-width'] = w;
-            set['stroke-linecap'] = cap;
-            set['stroke-linejoin'] = join;
-            if (dash) set['stroke-dasharray'] = dash;
-            if (opacity < 1) set['stroke-opacity'] = opacity;
-            if (nss) set['vector-effect'] = 'non-scaling-stroke';
 
-            return set;
-        },
-
-        compilePathDescription( points ) {
+        compilePathDescription( points: pathDescriptionSegment[] ): string {
             const d = [];
 
             for (const p of points) {
@@ -54,14 +44,14 @@ const html = {
 };
 
 const math = {
-    toRadians( degrees ) {
+    toRadians( degrees: number ): number {
         return degrees * (Math.PI / 180);
     },
 
-    fromAngle( angle, length=1, tx=0, ty=0, svgCommand, precision ) {
-        const a = [
-            Math.sin( math.toRadians( angle ) ) * length + tx,
-            - Math.cos( math.toRadians( angle ) ) * length + ty,
+    fromAngle( point: point, angle: number, length: number, precision?:number ): point {
+        const a: point = [
+            Math.sin( math.toRadians( angle ) ) * length + point[0],
+            - Math.cos( math.toRadians( angle ) ) * length + point[1],
         ];
 
         if (precision) {
@@ -69,31 +59,33 @@ const math = {
             a[ 1 ] = Math.round( a[ 1 ] * precision );
         }
 
-        if (svgCommand) a.unshift( svgCommand );
-
         return a;
     },
 
-    rectFromLine( p1, p2, a1, a2, w1, w2, precision ) {
-        w1 /= 2;
-        w2 /= 2;
+    rectFromLine(
+        pointBottom: point, pointTop: point,
+        angleBottom: number, angleTop: number,
+        widthBottom: number, widthTop: number,
+        precision?: number
+    ): [ point, point, point, point ] {
+        widthBottom /= 2;
+        widthTop /= 2;
         return [
-            math.fromAngle( a1 - 90, w1, p1[0], p1[1], 'M', precision ),
-            math.fromAngle( a2 - 90, w2, p2[0], p2[1], 'L', precision ),
-            math.fromAngle( a2 + 90, w2, p2[0], p2[1], 'L', precision ),
-            math.fromAngle( a1 + 90, w1, p1[0], p1[1], 'L', precision ),
-            'Z',
+            math.fromAngle( pointBottom, angleBottom - 90, widthBottom, precision ),
+            math.fromAngle( pointTop, angleTop - 90, widthTop, precision ),
+            math.fromAngle( pointTop, angleTop + 90, widthTop, precision ),
+            math.fromAngle( pointBottom, angleBottom + 90, widthBottom, precision )
         ];
     },
 
-    pointOnLine( p1, p2, d ) {
+    pointOnLine( p1: point, p2: point, d: number ): point {
         return [
             p1[0] + d * (p2[0] - p1[0]),
             p1[1] + d * (p2[1] - p1[1]),
         ];
     },
 
-    distance( p1, p2 ) {
+    distance( p1: point, p2: point ): number {
         const dx = p1[0] - p2[0];
         const dy = p1[1] - p2[1];
         return Math.sqrt( dx*dx + dy*dy );
@@ -101,7 +93,7 @@ const math = {
 };
 
 const plantHelper = {
-    rootPosAngle( rng, xMax, maxAngle ) {
+    rootPosAngle( rng: rng, xMax: number, maxAngle: number ) {
         const x = rng.range( -xMax, xMax );
         const f = Math.abs( x ) / xMax;
         return {
@@ -110,12 +102,12 @@ const plantHelper = {
         };
     },
 
-    segmentAngle( baseNode ) {
+    segmentAngle( baseNode: node ): number {
         if (baseNode.attr.segmentAngle !== undefined) return baseNode.attr.segmentAngle;
         return baseNode.attr.angle;
     },
 
-    nextAngle( rng, pos, prevNode, variance, alternate ) {
+    nextAngle( rng: rng, pos: nodePos, prevNode: node, variance: number, alternate: boolean ): number {
         if (pos.isOffshoot) return prevNode.attr.angle;
 
         const pa = this.segmentAngle( prevNode );
@@ -129,7 +121,7 @@ const plantHelper = {
         }
     },
 
-    archingBranchAngle( rng, pos, prevNode, variance, numAdjust ) {
+    archingBranchAngle( rng: rng, pos: nodePos, prevNode: node, variance: number, numAdjust: number ): number {
         if (pos.isOffshoot) return prevNode.attr.angle;
 
         const pa = plantHelper.segmentAngle( prevNode );
@@ -139,29 +131,34 @@ const plantHelper = {
         return pa + f * base + rng.range( -variance, variance );
     },
 
-    repeat( rng, n, p, cb, shuffle=true ) {
-        const a = [];
-
-        if (typeof p == 'function') {
-            cb = p;
-            p = 1;
+    repeat<T,U=number>(
+        { rng, cb, p=1, shuffle=true, steps, values, n }:
+        {
+            rng: rng,
+            cb: ( i: number | U ) => T,
+            steps?: { from: number, to: number, step: number },
+            values?: U[],
+            n?: number | [ number, number ],
+            p?: number, shuffle?: boolean
         }
+    ): T[] {
+        const a: T[] = [];
 
         if (p <= 0) return a;
         const test = p < 1;
 
-        if (Array.isArray( n )) {
-            for (let i of n) if (!test || rng.test( p )) {
+        if (values !== undefined) {
+            for (let v of values) if (!test || rng.test( p )) {
+                a.push( cb( v ) );
+            }
+        }
+        else if (steps !== undefined) {
+            for (let i=steps.from; i<=steps.to; i+=steps.step) if (!test || rng.test( p )) {
                 a.push( cb( i ) );
             }
         }
-        else if (typeof n == 'object') {
-            for (let i=n.from; i<=n.to; i+=n.step) if (!test || rng.test( p )) {
-                a.push( cb( i ) );
-            }
-        }
-        else {
-            if (p > 1 && p > n) n = rng.intRange( n, p );
+        else if (n !== undefined) {
+            if (Array.isArray( n )) n = rng.intRange( n[0], n[1] );
 
             for (let i=0; i<n; i++) if (!test || rng.test( p )) {
                 a.push( cb( i ) );
@@ -174,35 +171,49 @@ const plantHelper = {
     }
 };
 
-const rng = seed => {
-    if (seed === undefined) seed = (Math.random() + '').substring( 2 ) * 1;
-    let fn;
+interface rng {
+    seed: string;
+    reset(): void;
+    random( v: number ): number;
+    test( p: number ): boolean;
+    test<T,U>( p: number, pass: T, fail: U ): T | U;
+    test<T,U>( p: number, pass?: T, fail?: U ): T | U | boolean;
+    range( v0: number, v1: number ): number;
+    intRange( v0: number, v1: number ): number;
+    ranges( ... ranges: Array<[ number, number, number? ]> ): number;
+    shuffle( a: Array<any> ): Array<any>;
+};
+const rng = (seed: rngSeed): rng => {
+    const seedStr = (seed === undefined) ? (Math.random() + '').substring( 2 ) : String( seed );
+    let fn: seedrandom.prng;
 
     const rng = {
-        get seed() {
-            return seed;
+        get seed(): string {
+            return seedStr;
         },
-        reset() {
-            fn = (new RNG( seed )).random;
+        reset(): void {
+            fn = seedrandom( seedStr );
         },
 
-        random( v=1 ) {
+        random( v=1 ): number {
             return fn() * v;
         },
-        test( p=.5, pass=true, fail=false ) {
-            if (p >= 1) return pass;
-            if (p <= 0) return fail;
-            return fn() < p ? pass : fail;
+        test<T,U>( p=.5, pass?: T, fail?: U ): T | U | boolean {
+            const r = p >= 1 ? true : p <= 0 ? false : fn() < p;
+            if (r) return pass === undefined ? true : pass;
+            return fail === undefined ? false : fail;
         },
-        range( v0, v1 ) {
+        range( v0: number, v1: number ): number {
             if (v0==v1) return v0;
             return v0 + fn() * ( v1 - v0 );
         },
-        intRange( v0, v1 ) {
+        intRange( v0: number, v1: number ): number {
             if (v0==v1) return v0;
             return v0 + Math.floor( fn() * ( v1 - v0 + 1 ) );
         },
-        ranges( ... ranges ) {
+        ranges( ... ranges: Array<[ number, number, number? ]> ): number {
+            if (!ranges.length) return 0;
+
             const ep = 1 / ranges.length;
 
             ranges = [ ... ranges ];
@@ -213,10 +224,10 @@ const rng = seed => {
                 if (rng.test( p )) return rng.range( r[0], r[1] );
             }
 
-            return rng.range( last[0], last[1] );
+            return last ? rng.range( last[0], last[1] ) : 0;
         },
 
-        shuffle( a ) {
+        shuffle( a: Array<any> ): Array<any> {
             for (let i = a.length - 1; i > 0; i--) {
                 const j = Math.floor( fn() * (i + 1) );
                 const tmp = a[i];
@@ -232,35 +243,50 @@ const rng = seed => {
     return rng;
 }
 
+interface bboxData {
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
+    [propName: string]: any;
+};
 class BBox {
-    constructor({ x0, x1, y0, y1 }={}) {
-        this.x0 = Infinity;
-        this.x1 = -Infinity;
-        this.y0 = Infinity;
-        this.y1 = -Infinity;
+    x0: number;
+    x1: number;
+    y0: number;
+    y1: number;
 
-        if (x0 !== undefined) this.x0 = x0;
-        if (x1 !== undefined) this.x1 = x1;
-        if (y0 !== undefined) this.y0 = y0;
-        if (y1 !== undefined) this.y1 = y1;
+    constructor(data?: bboxData) {
+        if (data) {
+            this.x0 = data.x0;
+            this.x1 = data.x1;
+            this.y0 = data.y0;
+            this.y1 = data.y1;
+        }
+        else {
+            this.x0 = Infinity;
+            this.x1 = -Infinity;
+            this.y0 = Infinity;
+            this.y1 = -Infinity;
+        }
     }
 
-    addX( v ) {
+    addX( v: number ): this {
         if (v < this.x0) this.x0 = v;
         if (v > this.x1) this.x1 = v;
         return this;
     }
-    addY( v ) {
+    addY( v: number ): this {
         if (v < this.y0) this.y0 = v;
         if (v > this.y1) this.y1 = v;
         return this;
     }
-    addPoint( x, y ) {
+    addPoint( x: number, y: number ): this {
         this.addX( x );
         this.addY( y );
         return this;
     }
-    addBBox( bbox ) {
+    addBBox( bbox: bboxData ): this {
         this.addX( bbox.x0 );
         this.addX( bbox.x1 );
         this.addY( bbox.y0 );
@@ -268,7 +294,7 @@ class BBox {
         return this;
     }
 
-    expand( v ) {
+    expand( v: number ): this {
         this.x0 -= v;
         this.x1 += v;
 
@@ -278,24 +304,24 @@ class BBox {
         return this;
     }
 
-    contains( bbox, strict ) {
+    contains( bbox: bboxData, strict: boolean ): boolean {
         if (strict) return this.x0 < bbox.x0 && this.x1 > bbox.x1 && this.y0 < bbox.y0 && this.y1 > bbox.y1;
         return this.x0 <= bbox.x0 && this.x1 >= bbox.x1 && this.y0 <= bbox.y0 && this.y1 >= bbox.y1;
     }
-    containedBy( bbox, strict ) {
+    containedBy( bbox: bboxData, strict: boolean ): boolean {
         if (strict) return this.x0 > bbox.x0 && this.x1 < bbox.x1 && this.y0 > bbox.y0 && this.y1 < bbox.y1;
         return this.x0 >= bbox.x0 && this.x1 <= bbox.x1 && this.y0 >= bbox.y0 && this.y1 <= bbox.y1;
     }
-    containsPoint( x, y, strict ) {
+    containsPoint( x: number, y: number, strict: boolean ): boolean {
         if (strict) return !( x <= this.x0 || x >= this.x1 || y <= this.y0 || y >= this.y1 );
         return !( x < this.x0 || x > this.x1 || y < this.y0 || y > this.y1 );
     }
 
-    clone() {
+    clone(): BBox {
         return new BBox( this.data );
     }
 
-    withPrecision( p ) {
+    withPrecision( p: number ): BBox {
         return new BBox({
             x0: Math.round( this.x0 * p ),
             x1: Math.round( this.x1 * p ),
@@ -304,18 +330,19 @@ class BBox {
         });
     }
 
-    get width() {
+    get width(): number {
         return this.x1 - this.x0;
     }
-    get height() {
+    get height(): number {
         return this.y1 - this.y0;
     }
 
-    get aspectRatio() {
+    get aspectRatio(): number {
+        if (!this.height) return 0;
         return this.width / this.height;
     }
 
-    get data() {
+    get data(): bboxData {
         return {
             x0: this.x0,
             x1: this.x1,
@@ -324,21 +351,66 @@ class BBox {
         };
     }
 
-    get pointsArray() {
+    get pointsArray(): [ point, point ] {
         return [
             [ this.x0, this.y0 ],
             [ this.x1, this.y1 ],
         ];
     }
 
-    get viewBox() {
+    get viewBox(): string {
         return `${this.x0} ${this.y0} ${this.width} ${this.height}`;
     }
 }
 
+interface nodePos {
+    num: number,
+    branchNum: number,
+
+    height: number,
+    offshootHeight: number,
+
+    isRoot: boolean,
+
+    isLast: boolean,
+    isLastBranch: boolean,
+
+    isOffshoot: boolean,
+
+    numFactor: number,
+    branchFactor: number,
+};
+interface nodeAttr {
+    [key: string]: any,
+};
+interface offshoot {
+    n: number,
+    attr?: nodeAttr,
+};
+interface node {
+    pos: nodePos,
+    attr: nodeAttr,
+    offshoots: node[],
+
+    prev: node | null,
+    next: node | null,
+
+    branchRoot: node,
+    treeRoot: node,
+
+    offshootNum: number,
+};
+type getNode = (pos: nodePos, prev: node | null, rootAttr: nodeAttr) => nodeAttr;
+type getOffshoots = (node: node | null) => offshoot[];
 class ProcTree {
 
-    constructor( maxBranchNum, getNode, getOffshoots ) {
+    maxBranchNum: number;
+    getNode: getNode;
+    getOffshoots: getOffshoots;
+
+    private roots: node[];
+
+    constructor( maxBranchNum: number, getNode: getNode, getOffshoots: getOffshoots ) {
         this.maxBranchNum = maxBranchNum;
         this.getNode = getNode;
         this.getOffshoots = getOffshoots;
@@ -346,12 +418,12 @@ class ProcTree {
         this.roots = [];
     }
 
-    grow() {
+    grow(): void {
         const roots = this.getOffshoots( null );
-        for (let i in roots) this.growBranch( null, i, roots[ i ].n, roots[ i ].attr );
+        for (let i in roots) this.growBranch( null, Number( i ), roots[ i ].n, roots[ i ].attr || {} );
     }
 
-    growBranch( rootNode, offshootNum, segmentCount, attr ) {
+    growBranch( rootNode: node | null, offshootNum: number, segmentCount: number, attr: nodeAttr ): void {
         const isTreeRoot = !rootNode;
 
         let node = this.addNode( rootNode, true, offshootNum, segmentCount, attr );
@@ -361,35 +433,37 @@ class ProcTree {
 
         if (!isLastBranch && isTreeRoot) {
             const offshoots = this.getOffshoots( node );
-            for (let i in offshoots) this.growBranch( node, i, offshoots[ i ].n, offshoots[ i ].attr );
+            for (let i in offshoots) this.growBranch( node, Number( i ), offshoots[ i ].n, offshoots[ i ].attr || {} );
         }
 
         for (let i=0; i<segmentCount; i++) {
-            node = this.addNode( node, false, offshootNum, segmentCount );
+            node = this.addNode( node, false, offshootNum, segmentCount, {} );
             if (!isLastBranch) {
                 const offshoots = this.getOffshoots( node );
-                for (let i in offshoots) this.growBranch( node, i, offshoots[ i ].n, offshoots[ i ].attr );
+                for (let i in offshoots) this.growBranch( node, Number( i ), offshoots[ i ].n, offshoots[ i ].attr || {} );
             }
         }
     }
 
-    addNode( prev, isOffshoot, offshootNum, maxNum, rootAttr ) {
+    addNode( prev: node | null, isOffshoot: boolean, offshootNum: number, maxNum: number, rootAttr: nodeAttr ): node {
         const pos = this.getPos( prev ? prev.pos : null, isOffshoot, maxNum );
-        const node = {
+        const node: node = {
             pos,
-            attr: { ... (rootAttr||{}), ... (this.getNode( pos, prev, rootAttr )||{}) },
+            attr: { ... rootAttr, ... this.getNode( pos, prev, rootAttr ) },
             offshoots: [],
 
             prev: null,
             next: null,
 
-            branchRoot: null,
-            treeRoot: null,
+            branchRoot: <node>{},
+            treeRoot: <node>{},
+
+            offshootNum: 0,
         };
 
         if (prev) {
             node.prev = prev;
-            node.branchRoot = isOffshoot ? node : prev.isOffshoot ? prev : prev.branchRoot;
+            node.branchRoot = isOffshoot ? node : prev.pos.isOffshoot ? prev : prev.branchRoot;
             node.treeRoot = prev.treeRoot ? prev.treeRoot : prev;
 
             if (isOffshoot) {
@@ -410,8 +484,8 @@ class ProcTree {
         return node;
     }
 
-    getPos( prev, isOffshoot, maxNum ) {
-        if (!prev) return {
+    getPos( prev: nodePos | null, isOffshoot: boolean, maxNum: number ): nodePos {
+        if (prev === null) return {
             num: 0,
             branchNum: 0,
 
@@ -429,7 +503,7 @@ class ProcTree {
             branchFactor: 1,
         };
 
-        const pos = {
+        const pos: nodePos = {
             num: isOffshoot ? 0 : prev.num + 1,
             branchNum: isOffshoot ? prev.branchNum + 1 : prev.branchNum,
 
@@ -442,6 +516,9 @@ class ProcTree {
             isLastBranch: false,
 
             isOffshoot,
+
+            numFactor: 0,
+            branchFactor: 0,
         };
 
         if (pos.num == maxNum) pos.isLast = true;
@@ -453,14 +530,14 @@ class ProcTree {
         return pos;
     }
 
-    eachSegment( cb ) {
+    eachSegment( cb: (n0: node, n1: node) => void ): void {
         for (let node of this.roots) this._each( node, cb );
     }
-    _each( node, cb ) {
+    _each( node: node | null, cb: (n0: node, n1: node) => void ): void {
         // note: the treeRoot node can have offshoots
         // other nodes that are branchRoots cannot have offshoots
         while ( node ) {
-            if (node.pos.num > 0) cb( node.prev, node );
+            if (node.pos.num > 0 && node.prev) cb( node.prev, node );
             for (let offshootNode of node.offshoots) this._each( offshootNode.next, cb );
             node = node.next;
         }
@@ -471,7 +548,7 @@ export {
     html,
     math,
     plantHelper,
-    rng,
+    rng, rng as rngInterface,
     BBox,
-    ProcTree,
+    ProcTree, nodePos, nodeAttr, offshoot, node
 };

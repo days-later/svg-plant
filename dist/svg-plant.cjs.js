@@ -1,4 +1,10 @@
-import seedrandom from 'seedrandom';
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var seedrandom = _interopDefault(require('seedrandom'));
 
 function createCommonjsModule(fn, basedir, module) {
 	return module = {
@@ -2386,5 +2392,13 @@ var Genera = {
   'Pilea': PileaGenus
 };
 
-export { BaseGenus, BushyPlantGenus, DevTools, DragonTreeGenus, Genera, PileaGenus, SvgPlant, ZamiaGenus, plantHelper };
-//# sourceMappingURL=svg-plant.esm.js.map
+exports.BaseGenus = BaseGenus;
+exports.BushyPlantGenus = BushyPlantGenus;
+exports.DevTools = DevTools;
+exports.DragonTreeGenus = DragonTreeGenus;
+exports.Genera = Genera;
+exports.PileaGenus = PileaGenus;
+exports.SvgPlant = SvgPlant;
+exports.ZamiaGenus = ZamiaGenus;
+exports.plantHelper = plantHelper;
+//# sourceMappingURL=svg-plant.cjs.js.map

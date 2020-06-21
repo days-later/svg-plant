@@ -1,9 +1,10 @@
 import { BaseGenus } from "./BaseGenus";
-import { plantHelper } from "../util/util";
+import { plantHelper, node, nodePos, nodeAttr } from "../util/util";
+import { rngSeed, Genus, leafDefinition } from '../types';
 
-class BushyPlantGenus extends BaseGenus {
+class BushyPlantGenus extends BaseGenus implements Genus {
 
-    constructor( rngSeed ) {
+    constructor( rngSeed?: rngSeed ) {
         super( rngSeed );
 
         this.width = 6.1;
@@ -37,7 +38,7 @@ class BushyPlantGenus extends BaseGenus {
             },
         ];
     }
-    getOffshoots( node ) {
+    getOffshoots( node: node ) {
         if (node.pos.isLast || node.pos.num==0) return [];
 
         const p = .5 * (.5 + .5 * node.pos.numFactor) * (.5 + .5 * node.pos.branchFactor);
@@ -62,11 +63,11 @@ class BushyPlantGenus extends BaseGenus {
         return a;
     }
 
-    getNodeWidth( pos, prev, _attr ) {
+    getNodeWidth( pos: nodePos, prev: node | null, _attr: nodeAttr ) {
         if (pos.isOffshoot && prev) return prev.attr.width;
         return .1 * (.1 + .9 * pos.branchFactor);
     }
-    getSegmentLength( pos, prev, _attr ) {
+    getSegmentLength( pos: nodePos, prev: node | null, _attr: nodeAttr ) {
         if (!prev) return 1;
         if (!pos.isOffshoot && pos.branchNum>0) return prev.attr.length * .75;
         if (!pos.isOffshoot) return prev.attr.length;
@@ -74,21 +75,21 @@ class BushyPlantGenus extends BaseGenus {
         const f = .2 + .8 * (prev.branchRoot.prev ? prev.branchRoot.prev.pos.numFactor : 1);
         return prev.attr.length * f;
     }
-    getSegmentAngle( pos, prev, _attr ) {
+    getSegmentAngle( pos: nodePos, prev: node, _attr: nodeAttr ) {
         if (pos.branchNum>0) return plantHelper.nextAngle( this.rng, pos, prev, 16, true );
         return plantHelper.nextAngle( this.rng, pos, prev, 8, true );
     }
 
-    getSegmentStyle( _node0, _node1 ) {
+    getSegmentStyle( _n0: node, _n1: node ) {
         return this.segmentStyle;
     }
 
-    getLeaves( _n0, n1 ) {
+    getLeaves( _n0: node, n1: node ) {
         if (n1.pos.branchNum==0 && n1.pos.num<2) return [];
 
-        const leaves = [];
+        const leaves: leafDefinition[] = [];
 
-        const addLeaf = avf => {
+        const addLeaf = (avf: number) => {
             leaves.push({
                 angle: n1.attr.angle + (avf ? (avf * this.rng.range( 20, 40 )) : this.rng.range( -10, 10 )),
                 length: this.rng.range( .5, .75 ),

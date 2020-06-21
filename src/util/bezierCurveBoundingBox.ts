@@ -1,30 +1,32 @@
 // ripped from https://github.com/kfitfk/svg-boundings
 
-var MIN_X = 'minX';
-var MAX_X = 'maxX';
-var MIN_Y = 'minY';
-var MAX_Y = 'maxY';
+interface bounds {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
 
 /**
  * expand the x-bounds, if the value lies outside the bounding box
  */
-function expandXBounds(bounds, value) {
-  if (bounds[MIN_X] > value) bounds[MIN_X] = value;
-  else if (bounds[MAX_X] < value) bounds[MAX_X] = value;
+function expandXBounds(bounds: bounds, value: number) {
+  if (bounds.minX > value) bounds.minX = value;
+  else if (bounds.maxX < value) bounds.maxX = value;
 }
 
 /**
  * expand the y-bounds, if the value lies outside the bounding box
  */
-function expandYBounds(bounds, value) {
-  if (bounds[MIN_Y] > value) bounds[MIN_Y] = value;
-  else if (bounds[MAX_Y] < value) bounds[MAX_Y] = value;
+function expandYBounds(bounds: bounds, value: number) {
+  if (bounds.minY > value) bounds.minY = value;
+  else if (bounds.maxY < value) bounds.maxY = value;
 }
 
 /**
  * Calculate the bezier value for one dimension at distance 't'
  */
-function calculateBezier(t, p0, p1, p2, p3) {
+function calculateBezier(t: number, p0: number, p1: number, p2: number, p3: number) {
   var mt = 1-t;
   return (mt*mt*mt*p0) + (3*mt*mt*t*p1) + (3*mt*t*t*p2) + (t*t*t*p3);
 }
@@ -33,12 +35,17 @@ function calculateBezier(t, p0, p1, p2, p3) {
  * Calculate the bounding box for this bezier curve.
  * http://pomax.nihongoresources.com/pages/bezier/
  */
-function bezierCurveBoundingBox(x1, y1, cx1, cy1, cx2, cy2, x2, y2) {
-  var bounds = {};
-  bounds[MIN_X] = Math.min(x1, x2);
-  bounds[MIN_Y] = Math.min(y1, y2);
-  bounds[MAX_X] = Math.max(x1, x2);
-  bounds[MAX_Y] = Math.max(y1, y2);
+function bezierCurveBoundingBox(
+  x1: number, y1: number,
+  cx1: number, cy1: number, cx2: number, cy2: number,
+  x2: number, y2: number
+) {
+  var bounds = {
+    minX: Math.min(x1, x2),
+    minY: Math.min(y1, y2),
+    maxX: Math.max(x1, x2),
+    maxY: Math.max(y1, y2),
+  };
 
   var dcx0 = cx1 - x1;
   var dcy0 = cy1 - y1;
@@ -47,7 +54,7 @@ function bezierCurveBoundingBox(x1, y1, cx1, cy1, cx2, cy2, x2, y2) {
   var dcx2 = x2 - cx2;
   var dcy2 = y2 - cy2;
 
-  if (cx1<bounds[MIN_X] || cx1>bounds[MAX_X] || cx2<bounds[MIN_X] || cx2>bounds[MAX_X]) {
+  if (cx1<bounds.minX || cx1>bounds.maxX || cx2<bounds.minX || cx2>bounds.maxX) {
     // Just for better reading because we are doing middle school math here
     var a = dcx0;
     var b = dcx1;
@@ -72,7 +79,7 @@ function bezierCurveBoundingBox(x1, y1, cx1, cy1, cx2, cy2, x2, y2) {
     }
   }
 
-  if (cy1<bounds[MIN_Y] || cy1>bounds[MAX_Y] || cy2<bounds[MIN_Y] || cy2>bounds[MAX_Y]) {
+  if (cy1<bounds.minY || cy1>bounds.maxY || cy2<bounds.minY || cy2>bounds.maxY) {
     a = dcy0;
     b = dcy1;
     c = dcy2;
@@ -97,10 +104,10 @@ function bezierCurveBoundingBox(x1, y1, cx1, cy1, cx2, cy2, x2, y2) {
   }
 
   return {
-    x0: bounds[MIN_X],
-    x1: bounds[MAX_X],
-    y0: bounds[MIN_Y],
-    y1: bounds[MAX_Y],
+    x0: bounds.minX,
+    x1: bounds.maxX,
+    y0: bounds.minY,
+    y1: bounds.maxY,
   };
 }
 

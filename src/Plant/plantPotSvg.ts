@@ -1,7 +1,15 @@
 import { html } from "../util/util";
+import { attributeSet, pathDescriptionSegment } from '../types';
 
-const plantPotSvg = pathAttr => {
-    const baseCfg = {
+interface PlantPotCfg {
+    rimHeight: number,
+    rimLipOuter: number,
+    rimLipInner: number,
+    bottom: number,
+};
+
+function plantPotSvg( pathAttr: attributeSet ): SVGElement {
+    const baseCfg: PlantPotCfg = {
         rimHeight: 20,
         rimLipOuter: 2,
         rimLipInner: 4,
@@ -11,9 +19,9 @@ const plantPotSvg = pathAttr => {
     const sw = pathAttr ? ('stroke-width' in pathAttr ? pathAttr[ 'stroke-width' ] : 2) : false;
     if (sw) pathAttr[ 'stroke-width' ] = sw;
 
-    const pad = sw ? sw / 2 : 0;
+    const pad = sw && typeof sw == 'number' ? sw / 2 : 0;
 
-    const getPoints = cfg => {
+    const getPoints = (cfg: PlantPotCfg): pathDescriptionSegment[] => {
         return [
             [ 'M', pad, pad ],
             [ 'L', 100-pad, pad ],

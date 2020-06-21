@@ -1,8 +1,18 @@
-import { rng } from "../util/util";
+import { rng, nodePos, nodeAttr, offshoot, node } from "../util/util";
+import { rngSeed, attributeSet, leafCurvesHandles, leafDefinition, Genus } from '../types';
 
-class BaseGenus {
+class BaseGenus implements Genus {
 
-    constructor( rngSeed ) {
+    rng: rng;
+    width: number;
+    height: number;
+    maxBranchNum: number;
+
+    segmentStyle: attributeSet;
+    leafStyle: attributeSet;
+    leafCurveHandles: leafCurvesHandles;
+
+    constructor( rngSeed?: rngSeed ) {
         this.rng = rng( rngSeed );
 
         this.width = 4;
@@ -28,22 +38,22 @@ class BaseGenus {
         };
     }
 
-    static get genusName() {
+    static get genusName(): string {
         const cn = this.name;
         return cn.substring( 0, cn.length - 5 );
     }
-    get genusName() {
+    get genusName(): string {
         const cn = this.constructor.name;
         return cn.substring( 0, cn.length - 5 );
     }
-    get rngSeed() {
+    get rngSeed(): string {
         return this.rng.seed;
     }
-    reset() {
+    reset(): void {
         this.rng.reset();
     }
 
-    getRoots() {
+    getRoots(): offshoot[] {
         return [
             {
                 n: 3,
@@ -51,7 +61,7 @@ class BaseGenus {
             },
         ];
     }
-    getOffshoots( node ) {
+    getOffshoots( node: node ): offshoot[] {
         if (node.pos.isLast || node.pos.num==0) return [];
 
         return [
@@ -66,22 +76,22 @@ class BaseGenus {
         ];
     }
 
-    getNodeWidth( _pos, _prev, _attr ) {
+    getNodeWidth( _pos: nodePos, _prev: node | null, _attr: nodeAttr ): number {
         return .1;
     }
-    getSegmentLength( _pos, _prev, _attr ) {
+    getSegmentLength( _pos: nodePos, _prev: node | null, _attr: nodeAttr ) {
         return 1;
     }
-    getSegmentAngle( pos, prev, _attr ) {
+    getSegmentAngle( pos: nodePos, prev: node, _attr: nodeAttr ) {
         if (pos.isOffshoot) return prev.attr.angle;
         return prev.attr.segmentAngle !== undefined ? prev.attr.segmentAngle : prev.attr.angle;
     }
 
-    getSegmentStyle( _node0, _node1 ) {
+    getSegmentStyle( _n0: node, _n1: node ): attributeSet {
         return this.segmentStyle;
     }
 
-    getLeaves( _n0, n1 ) {
+    getLeaves( _n0: node, n1: node ): leafDefinition[] {
         if (!n1.pos.isLast) return [];
 
         return [

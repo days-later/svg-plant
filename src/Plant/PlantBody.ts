@@ -1,9 +1,12 @@
-import { ProcTree, html, math, BBox } from "../util/util";
+import { ProcTree, html, math, BBox, node, nodePos, nodeAttr, offshoot } from "../util/util";
 import { bezierCurveBoundingBox } from "../util/bezierCurveBoundingBox";
+import { point, attributeSet, leafCurvesHandles, leafDefinition, pathDescriptionSegment, Genus } from '../types';
 
 const precision = 10000;
-const prc = v => {
-    if (v.length) return [
+function prc(v: number): number;
+function prc(v: point): point;
+function prc(v: number | point): number | point {
+    if (Array.isArray( v )) return [
         Math.round( v[0] * precision ),
         Math.round( v[1] * precision ),
     ];
@@ -11,8 +14,39 @@ const prc = v => {
     return Math.round( v * precision );
 }
 
-class BranchSegment {
-    constructor( base, style, n0, n1 ) {
+interface PlantPart {
+    base: point;
+    top: point;
+
+    angle: number;
+    length: number;
+
+    ageOffset: number;
+    style: attributeSet;
+
+    bbox: BBox;
+
+    getPoints( age: number ): pathDescriptionSegment[] | undefined;
+};
+class BranchSegment implements PlantPart {
+    base: point;
+    top: point;
+
+    bottomWidth: number;
+    topWidth: number;
+
+    angle: number;
+    bottomAngle: number;
+    topAngle: number;
+
+    length: number;
+
+    ageOffset: number;
+    style: attributeSet;
+
+    bbox: BBox;
+
+    constructor( base: point, style: attributeSet, n0: node, n1: node ) {
         this.base = base;
 
         this.bottomWidth = n0.attr.width;
@@ -24,80 +58,86 @@ class BranchSegment {
 
         this.length = n0.attr.length;
 
-        this.top = math.fromAngle( this.angle, this.length, this.base[0], this.base[1] );
+        this.top = math.fromAngle( this.base, this.angle, this.length );
 
         this.ageOffset = n0.attr.totalLength;
-        this.branchNum = n0.pos.branchNum;
-
         this.style = style;
 
         this.bbox = this.getBoundingBox();
     }
 
-    getPoints( age ) {
+    getPoints( age: number ): pathDescriptionSegment[] | undefined {
         const ageFactor = this.getAgeFactor( age );
         if (!ageFactor) return;
 
         let top = this.top;
         if (ageFactor < 1) {
-            top = math.fromAngle( this.angle, this.length * ageFactor, this.base[0], this.base[1] );
+            top = math.fromAngle( this.base, this.angle, this.length * ageFactor );
         }
 
-        return math.rectFromLine(
+        const r = math.rectFromLine(
             this.base, top,
             this.bottomAngle, this.topAngle,
             this.bottomWidth, this.topWidth,
             precision,
         );
+
+        return [
+            'M', r[0],
+            'L', r[1],
+            'L', r[2],
+            'L', r[3],
+            'Z'
+        ];
     }
 
-    getBoundingBox() {
+    private getBoundingBox(): BBox {
         const points = math.rectFromLine(
             this.base, this.top,
             this.bottomAngle, this.topAngle,
             this.bottomWidth, this.topWidth,
-            false
+            undefined
         );
 
         const bb = new BBox();
-        bb.addPoint( points[0][1], points[0][2] );
-        bb.addPoint( points[1][1], points[1][2] );
-        bb.addPoint( points[2][1], points[2][2] );
-        bb.addPoint( points[3][1], points[3][2] );
+        bb.addPoint( points[0][0], points[0][1] );
+        bb.addPoint( points[1][0], points[1][1] );
+        bb.addPoint( points[2][0], points[2][1] );
+        bb.addPoint( points[3][0], points[3][1] );
 
         return bb;
     }
 
-    getAgeFactor( age ) {
+    private getAgeFactor( age: number ): number {
         if (age <= this.ageOffset) return 0;
         if (age >= this.ageOffset + this.length) return 1;
         return (age - this.ageOffset) / this.length;
     }
 
-    getOffsetPoint( x, y ) {
+    getOffsetPoint( x: number, y: number ): point {
         if (!x) {
             if (!y) return this.base;
             if (y==1) return this.top;
-            return math.fromAngle( this.angle, this.length * y, this.base[0], this.base[1] );
+            return math.fromAngle( this.base, this.angle, this.length * y );
         }
 
         const dir = this.angle < 0 ? 1 : -1;
 
         if (!y) {
-            return math.fromAngle( this.bottomAngle + 90*dir, this.bottomWidth/2 * x, this.base[0], this.base[1] );
+            return math.fromAngle( this.base, this.bottomAngle + 90*dir, this.bottomWidth/2 * x );
         }
 
         if (y==1) {
-            return math.fromAngle( this.topAngle + 90*dir, this.topWidth/2 * x, this.top[0], this.top[1] );
+            return math.fromAngle( this.top, this.topAngle + 90*dir, this.topWidth/2 * x );
         }
 
         const l1 = [
-            math.fromAngle( this.bottomAngle + 90*dir, this.bottomWidth/2, this.base[0], this.base[1] ),
-            math.fromAngle( this.topAngle + 90*dir, this.topWidth/2, this.top[0], this.top[1] )
+            math.fromAngle( this.base, this.bottomAngle + 90*dir, this.bottomWidth/2 ),
+            math.fromAngle( this.top, this.topAngle + 90*dir, this.topWidth/2 )
         ];
         const l2 = [
-            math.fromAngle( this.bottomAngle + 90*dir, -this.bottomWidth/2, this.base[0], this.base[1] ),
-            math.fromAngle( this.topAngle + 90*dir, -this.topWidth/2, this.top[0], this.top[1] )
+            math.fromAngle( this.base, this.bottomAngle + 90*dir, -this.bottomWidth/2 ),
+            math.fromAngle( this.top, this.topAngle + 90*dir, -this.topWidth/2 )
         ];
         const l3 = [
             math.pointOnLine( l1[0], l1[1], y ),
@@ -109,9 +149,21 @@ class BranchSegment {
         return math.pointOnLine( l3[0], l3[1], x );
     }
 }
+class Leaf implements PlantPart {
+    base: point;
+    pBase: point;
+    top: point;
 
-class Leaf {
-    constructor( segment, { angle, length, handles, style, xOffset, yOffset } ) {
+    angle: number;
+    length: number;
+    handles: leafCurvesHandles;
+
+    ageOffset: number;
+    style: attributeSet;
+
+    bbox: BBox;
+
+    constructor( segment: BranchSegment, { angle, length, handles, style, xOffset, yOffset }: leafDefinition ) {
         const base = segment.getOffsetPoint( xOffset, yOffset );
         this.base = base;
         this.pBase = prc( base );
@@ -120,7 +172,7 @@ class Leaf {
         this.length = length;
         this.handles = handles;
 
-        this.top = math.fromAngle( angle, length, base[0], base[1] );
+        this.top = math.fromAngle( base, angle, length );
 
         this.ageOffset = segment.ageOffset + segment.length * yOffset;
 
@@ -129,16 +181,16 @@ class Leaf {
         this.bbox = this.getBoundingBox();
     }
 
-    getPoints( age ) {
+    getPoints( age: number ): pathDescriptionSegment[] | undefined {
         const ageFactor = this.getAgeFactor( age );
         if (!ageFactor) return;
 
         let top = this.top;
         if (ageFactor < 1) {
-            top = math.fromAngle( this.angle, this.length * ageFactor, this.base[0], this.base[1] );
+            top = math.fromAngle( this.base, this.angle, this.length * ageFactor );
         }
 
-        const curves = this.getCurves( top, ageFactor, precision );
+        const curves = this.getCurves({ top, ageFactor, precision });
 
         top = prc( top );
 
@@ -149,8 +201,8 @@ class Leaf {
         ];
     }
 
-    getBoundingBox() {
-        const c = this.getCurves( this.top, 1, false );
+    private getBoundingBox(): BBox {
+        const c = this.getCurves({ top: this.top, ageFactor: 1 });
         const bb = new BBox(bezierCurveBoundingBox(
             this.base[0], this.base[1],
             c.up[0][0], c.up[0][1],
@@ -165,12 +217,14 @@ class Leaf {
             this.base[0], this.base[1],
         ));
 
-        if (this.style['stroke-width']) bb.expand( this.style['stroke-width'] / 2 );
+        if (typeof this.style['stroke-width'] == 'number') bb.expand( this.style['stroke-width'] / 2 );
 
         return bb;
     }
 
-    getCurves( top, ageFactor, precision ) {
+    private getCurves(
+        { top, ageFactor, precision }: { top: point; ageFactor: number; precision?: number; }
+    ): { up: [ point, point ], down: [ point, point ] } {
         const bha = this.handles.bottomAngle;
         const bhl = this.handles.bottomLength * ageFactor;
         const tha = this.handles.topAngle;
@@ -178,17 +232,17 @@ class Leaf {
 
         return {
             up: [
-                math.fromAngle( this.angle + bha, this.length * bhl, this.base[0], this.base[1], '', precision ),
-                math.fromAngle( this.angle + tha, this.length * thl, top[0], top[1], '', precision ),
+                math.fromAngle( this.base, this.angle + bha, this.length * bhl, precision ),
+                math.fromAngle( top, this.angle + tha, this.length * thl, precision ),
             ],
             down: [
-                math.fromAngle( this.angle - tha, this.length * thl, top[0], top[1], '', precision ),
-                math.fromAngle( this.angle - bha, this.length * bhl, this.base[0], this.base[1], '', precision ),
+                math.fromAngle( top, this.angle - tha, this.length * thl, precision ),
+                math.fromAngle( this.base, this.angle - bha, this.length * bhl, precision ),
             ],
         };
     }
 
-    getAgeFactor( age ) {
+    private getAgeFactor( age: number ): number {
         if (age <= this.ageOffset) return 0;
         if (age >= this.ageOffset + this.length) return 1;
         return (age - this.ageOffset) / this.length;
@@ -196,12 +250,15 @@ class Leaf {
 }
 
 class Branches {
+    segments: BranchSegment[][];
+    leaves: Leaf[][];
+
     constructor() {
         this.segments = [];
         this.leaves = [];
     }
 
-    addSegment( branchNum, segment ) {
+    addSegment( branchNum: number, segment: BranchSegment ) {
         let branch = this.segments[ branchNum ];
         if (!branch) {
             branch = [];
@@ -209,7 +266,7 @@ class Branches {
         }
         branch.push( segment );
     }
-    addLeaf( branchNum, leaf ) {
+    addLeaf( branchNum: number, leaf: Leaf ) {
         let branch = this.leaves[ branchNum ];
         if (!branch) {
             branch = [];
@@ -218,8 +275,8 @@ class Branches {
         branch.push( leaf );
     }
 
-    getArray() {
-        let ret = [];
+    getArray(): PlantPart[] {
+        let ret: PlantPart[] = [];
         for (let i=0; i<this.segments.length; i++) {
             ret = ret.concat( this.segments[ i ] || [] );
             ret = ret.concat( this.sortLeaves( this.leaves[ i ] ) );
@@ -228,7 +285,7 @@ class Branches {
         return ret;
     }
 
-    sortLeaves( a ) {
+    sortLeaves( a: Leaf[] ): Leaf[] {
         if (!a) return [];
 
         return a.sort((l0,l1) => {
@@ -248,11 +305,40 @@ class Branches {
 }
 
 class PlantBody {
-    constructor( genus ) {
+    genus: Genus;
+
+    bbox: BBox;
+    yFactor: number;
+
+    private parts: PlantPart[] | undefined;
+    private maxAge: number;
+
+    constructor( genus: Genus ) {
         this.genus = genus;
+        this.bbox = new BBox;
+
+        this.maxAge = 0;
+        this.yFactor = 1;
     }
 
-    init() {
+    private getTree() {
+        const getNodeAttr = ( pos: nodePos, prev: node | null, attr: nodeAttr ): nodeAttr => {
+            return {
+                width: this.genus.getNodeWidth( pos, prev, attr ),
+                angle: prev ? this.genus.getSegmentAngle( pos, prev, attr ) : 0,
+                length: pos.isLast ? (prev ? prev.attr.length : 0) : this.genus.getSegmentLength( pos, prev, attr ),
+                totalLength: prev ? ((pos.isOffshoot ? 0 : prev.attr.length) + prev.attr.totalLength) : 0,
+            };
+        };
+        const getOffshoots = (node: node | null): offshoot[] => {
+            if (node === null) return this.genus.getRoots();
+            return this.genus.getOffshoots( node );
+        };
+
+        return new ProcTree( this.genus.maxBranchNum, getNodeAttr, getOffshoots );
+    }
+
+    init(): void {
         this.genus.reset();
 
         const tree = this.getTree();
@@ -266,12 +352,12 @@ class PlantBody {
         });
 
         const branches = new Branches;
-        const points = new Map();
+        const points = new Map;
         let maxAge = 0;
 
-        const getBasePoint = node => {
+        const getBasePoint = (node: node): point => {
             if (!node.prev) {
-                const p = [ node.attr.x || 0, 0 ];
+                const p: point = [ node.attr.x || 0, 0 ];
                 this.bbox.addPoint( p[0], p[1] );
                 return p;
             }
@@ -279,7 +365,7 @@ class PlantBody {
                 const p = points.get( node.prev );
                 if (p) return p;
 
-                const rp = [ node.prev.attr.x || 0, 0 ];
+                const rp: point = [ node.prev.attr.x || 0, 0 ];
                 points.set( node.prev, rp );
                 this.bbox.addPoint( rp[0], rp[1] );
                 return rp;
@@ -288,7 +374,7 @@ class PlantBody {
             return points.get( node );
         }
 
-        tree.eachSegment( (n0,n1) => {
+        tree.eachSegment( (n0: node, n1: node): void => {
 
             const base = getBasePoint( n0 );
             const style = this.genus.getSegmentStyle( n0, n1 );
@@ -298,7 +384,7 @@ class PlantBody {
             this.bbox.addBBox( s.bbox );
             branches.addSegment( n0.pos.branchNum, s );
 
-            this.genus.getLeaves( n0, n1 ).map( (cfg, i) => {
+            this.genus.getLeaves( n0, n1 ).map( (cfg: leafDefinition): void => {
                 const leaf = new Leaf( s, cfg );
 
                 this.bbox.addBBox( leaf.bbox );
@@ -322,36 +408,19 @@ class PlantBody {
         this.yFactor = (this.bbox.height / -this.bbox.y0) || 1;
     }
 
-    getTree() {
-        const getNodeAttr = ( pos, prev, attr ) => {
-            return {
-                width: this.genus.getNodeWidth( pos, prev, attr ),
-                angle: prev ? this.genus.getSegmentAngle( pos, prev, attr ) : 0,
-                length: pos.isLast ? (prev ? prev.attr.length : 0) : this.genus.getSegmentLength( pos, prev, attr ),
-                totalLength: prev ? ((pos.isOffshoot ? 0 : prev.attr.length) + prev.attr.totalLength) : 0,
-            };
-        };
-        const getOffshoots = node => {
-            if (!node) return this.genus.getRoots();
-            return this.genus.getOffshoots( node );
-        };
-
-        return new ProcTree( this.genus.maxBranchNum, getNodeAttr, getOffshoots );
-    }
-
-    render( age, colors=true, svg ) {
+    private render( age: number, colors=true, svg: SVGElement ): void {
         age *= this.maxAge;
 
-        for (const p of this.parts) {
+        if (this.parts) for (const p of this.parts) {
             const points = p.getPoints( age );
             if (!points) continue;
 
-            let style = {}, add = {};
+            let style = {} as attributeSet, add = {} as attributeSet;
 
             if (colors) {
                 style = p.style;
                 add = {};
-                if (style['stroke-width']) add['stroke-width'] = prc( style['stroke-width'] );
+                if (typeof style['stroke-width'] == 'number') add['stroke-width'] = prc( style['stroke-width'] );
             }
 
             const set = Object.assign( {}, style, add, {
@@ -361,8 +430,8 @@ class PlantBody {
         }
     }
 
-    getSvg( age, colors ) {
-        if (!this.segments) this.init();
+    getSvg( age: number, colors: boolean ): SVGElement {
+        if (this.parts === undefined) this.init();
 
         const svg = html.svg.root({
             class: 'svg-plant-body',
