@@ -12,7 +12,8 @@
         "declaration": true,
         "target": "esnext",
         "module": "esnext",
-        "strict": true
+        "strict": true,
+        "pretty": true,
     },
     "include": [
         "src/**/*"
