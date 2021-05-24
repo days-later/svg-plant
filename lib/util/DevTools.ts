@@ -1,6 +1,6 @@
 import { SvgPlant } from "../Plant/SvgPlant";
-import { PlantBody } from "../Plant/PlantBody";
-import { GenusConstructor } from '../types';
+import type { PlantBody } from "../Plant/PlantBody";
+import type { GenusConstructor } from '../types';
 
 const testPlantBodySize = (genus: GenusConstructor, n=1000) => {
     const widths: number[] = [];

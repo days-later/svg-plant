@@ -1,4 +1,4 @@
-import { rng, node, offshoot, nodeAttr, nodePos } from "./util/util";
+import type { rng, node, offshoot, nodeAttr, nodePos } from "./util/util";
 
 export interface attributeSet { [key: string]: string | number };
 

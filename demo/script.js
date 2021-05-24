@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const genera = Object.values( SvgPlant.Genera );
 let color, fill, seeds, genus;
 let animationDir = 'right';

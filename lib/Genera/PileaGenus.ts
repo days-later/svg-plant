@@ -1,6 +1,6 @@
 import { BaseGenus } from "./BaseGenus";
 import { plantHelper, node, offshoot, nodePos, nodeAttr } from "../util/util";
-import { Genus, rngSeed, attributeSet } from '../types';
+import type { Genus, rngSeed, attributeSet } from '../types';
 
 class PileaGenus extends BaseGenus implements Genus {
 

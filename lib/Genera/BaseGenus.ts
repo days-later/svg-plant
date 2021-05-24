@@ -1,5 +1,5 @@
 import { rng, nodePos, nodeAttr, offshoot, node } from "../util/util";
-import { rngSeed, attributeSet, leafCurvesHandles, leafDefinition, Genus } from '../types';
+import type { rngSeed, attributeSet, leafCurvesHandles, leafDefinition, Genus } from '../types';
 
 class BaseGenus implements Genus {
 

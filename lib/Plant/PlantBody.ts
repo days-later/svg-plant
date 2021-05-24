@@ -1,6 +1,6 @@
 import { ProcTree, html, math, BBox, node, nodePos, nodeAttr, offshoot } from "../util/util";
 import { bezierCurveBoundingBox } from "../util/bezierCurveBoundingBox";
-import { point, attributeSet, leafCurvesHandles, leafDefinition, pathDescriptionSegment, Genus } from '../types';
+import type { point, attributeSet, leafCurvesHandles, leafDefinition, pathDescriptionSegment, Genus } from '../types';
 
 const precision = 10000;
 function prc(v: number): number;

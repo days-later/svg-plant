@@ -1,0 +1,25 @@
+
+html {
+    --bg: #fff;
+    --panel-bg: #eee;
+
+    --fg: #111;
+
+    --btn-fg: #444;
+    --btn-hover-fg: #111;
+    --btn-hover-bg: #e4e4e4;
+    --btn-inactive-fg: #aaa;
+}
+
+html.dark {
+    --bg: #555;
+    --panel-bg: #222;
+
+    --fg: #fff;
+
+    --btn-fg: #ccc;
+    --btn-hover-fg: #fff;
+    --btn-hover-bg: #111;
+    --btn-inactive-fg: #666;
+
+}

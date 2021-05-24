@@ -1,7 +1,7 @@
 import { plantPotSvg } from "./plantPotSvg";
 import { PlantBody } from "./PlantBody";
 import { html } from "../util/util";
-import { attributeSet, Genus } from '../types';
+import type { attributeSet, Genus } from '../types';
 
 interface SvgPlantCfg {
     color: boolean,

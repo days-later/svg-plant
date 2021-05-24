@@ -1,6 +1,6 @@
 import { BaseGenus } from "./BaseGenus";
 import { plantHelper, node, nodePos, nodeAttr } from "../util/util";
-import { rngSeed, Genus, leafDefinition } from '../types';
+import type { rngSeed, Genus, leafDefinition } from '../types';
 
 class BushyPlantGenus extends BaseGenus implements Genus {
 

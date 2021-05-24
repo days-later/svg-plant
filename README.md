@@ -1,13 +1,13 @@
 # SvgPlant
 
-![Example 1](demo/Example1.svg)
-![Example 2](demo/Example2.svg)
-![Example 3](demo/Example3.svg)
-![Example 4](demo/Example4.svg)
+![Example 1](examples/Example1.svg)
+![Example 2](examples/Example2.svg)
+![Example 3](examples/Example3.svg)
+![Example 4](examples/Example4.svg)
 
 A library that lets you generate images of different types of plants as svg elements.
 
-[Demo](https://htmlpreview.github.io/?https://github.com/days-later/svg-plant/blob/main/demo/demo.html)
+[Demo](https://todo)
 
 
 ## Install
@@ -21,7 +21,7 @@ npm install --save svg-plant
 Load with script tag:
 
 ```html
-<script src="https://unpkg.com/svg-plant@2.0.2/dist/svg-plant.min.umd.js"></script>
+<script src="https://unpkg.com/svg-plant@latest/dist/svg-plant.min.umd.js"></script>
 ```
 
 

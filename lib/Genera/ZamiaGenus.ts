@@ -1,6 +1,6 @@
 import { BaseGenus } from "./BaseGenus";
 import { plantHelper, node, nodePos, nodeAttr } from "../util/util";
-import { Genus, rngSeed } from '../types';
+import type { Genus, rngSeed } from '../types';
 
 class ZamiaGenus extends BaseGenus implements Genus {
 

@@ -1,6 +1,6 @@
 import { BaseGenus } from "./BaseGenus";
 import { plantHelper, node, offshoot, nodePos, nodeAttr } from "../util/util";
-import { Genus, rngSeed, leafDefinition } from '../types';
+import type { Genus, rngSeed, leafDefinition } from '../types';
 
 class DragonTreeGenus extends BaseGenus implements Genus {
 

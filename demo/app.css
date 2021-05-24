@@ -1,7 +1,7 @@
 html {
     height: 100%;
     font: 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    color: #444;
+    color: var( --fg );
 }
 * {
     box-sizing: border-box;
@@ -16,9 +16,7 @@ body {
     overflow: hidden;
 
     transition: background-color .5s;
-}
-body.dark {
-    background: #555;
+    background: var( --bg );
 }
 
 #plant {
@@ -43,92 +41,6 @@ body.dark {
 }
 #plant > svg.right {
     left: 110%;
-}
-
-#controls {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 10;
-
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-
-    height: 110px;
-    background: #eee;
-
-    transition: background-color .5s;
-}
-body.dark #controls {
-    background: #222;
-}
-#controls > div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    width: 100px;
-    max-width: 25%;
-
-    user-select: none;
-
-    transition: background-color .5s;
-}
-#controls > div > svg {
-    width: 48px;
-    height: 48px;
-    fill: #444;
-
-    transition: fill .5s;
-}
-#controls > div.on > svg.off {
-    display: none;
-}
-#controls > div.off > svg.on {
-    display: none;
-}
-#controls > div > span {
-    margin: 5px 0 0;
-    font-size: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-
-    transition: color .5s;
-}
-body.dark #controls > div > svg, body.dark #controls > div > span {
-    color: #ccc;
-    fill: #ccc;
-}
-
-#controls > div:hover {
-    cursor: pointer;
-    background: #e4e4e4;
-}
-body.dark #controls > div:hover {
-    background: #111;
-}
-#controls > div:hover > svg, #controls > div:hover > span {
-    fill: #111;
-    color: #111;
-}
-body.dark #controls > div:hover > svg, body.dark #controls > div:hover > span {
-    fill: #fff;
-    color: #fff;
-}
-#controls > div.inactive, body.dark #controls > div.inactive {
-    cursor: default;
-    background: transparent;
-}
-#controls > div.inactive > svg, #controls > div.inactive > span {
-    fill: #aaa;
-    color: #aaa;
-}
-body.dark #controls > div.inactive > svg, body.dark #controls > div.inactive > span {
-    fill: #666;
-    color: #666;
 }
 
 #tools {

@@ -1,5 +1,5 @@
 import seedrandom from 'seedrandom';
-import { attributeSet, pathDescriptionSegment, point, rngSeed } from '../types';
+import type { attributeSet, pathDescriptionSegment, point, rngSeed } from '../types';
 
 const html = {
     node( tag: string, set?: attributeSet ): Element {
@@ -185,7 +185,7 @@ interface rng {
 };
 const rng = (seed: rngSeed): rng => {
     const seedStr = (seed === undefined) ? (Math.random() + '').substring( 2 ) : String( seed );
-    let fn: seedrandom.prng;
+    let fn: ReturnType<seedrandom>;
 
     const rng = {
         get seed(): string {
@@ -550,5 +550,7 @@ export {
     plantHelper,
     rng, rng as rngInterface,
     BBox,
-    ProcTree, nodePos, nodeAttr, offshoot, node
+    ProcTree
 };
+
+export type { nodePos, nodeAttr, offshoot, node }

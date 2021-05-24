@@ -1,5 +1,5 @@
 import { html } from "../util/util";
-import { attributeSet, pathDescriptionSegment } from '../types';
+import type { attributeSet, pathDescriptionSegment } from '../types';
 
 interface PlantPotCfg {
     rimHeight: number,
