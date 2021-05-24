@@ -2,24 +2,38 @@
 html {
     --bg: #fff;
     --panel-bg: #eee;
+    --panel-bc: #ddd;
 
     --fg: #111;
 
-    --btn-fg: #444;
-    --btn-hover-fg: #111;
-    --btn-hover-bg: #e4e4e4;
-    --btn-inactive-fg: #aaa;
+    --ctrl-height: 110px;
+    --ctrl-btn-fg: #444;
+    --ctrl-btn-hover-fg: #111;
+    --ctrl-btn-hover-bg: #e4e4e4;
+    --ctrl-btn-inactive-fg: #aaa;
+
+    --btn-fg: #eee;
+    --btn-bg: #444;
+    --btn-hover-fg: #fff;
+    --btn-hover-bg: #000;
+
+    --input-bg: #fff;
+    --input-border: #444;
+
+    --fs-sm: .7rem;
+    --fs-md: 1rem;
 }
 
 html.dark {
     --bg: #555;
     --panel-bg: #222;
+    --panel-bc: #333;
 
     --fg: #fff;
 
-    --btn-fg: #ccc;
-    --btn-hover-fg: #fff;
-    --btn-hover-bg: #111;
-    --btn-inactive-fg: #666;
+    --ctrl-btn-fg: #ccc;
+    --ctrl-btn-hover-fg: #fff;
+    --ctrl-btn-hover-bg: #111;
+    --ctrl-btn-inactive-fg: #666;
 
 }

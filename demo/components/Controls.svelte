@@ -1,18 +1,16 @@
 <script lang="ts">
-import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher } from "svelte";
 
+    const dispatch = createEventDispatcher<{ shuffle: void, toggleColor: void, toggleTools: void, nav: number }>();
 
     export let color: boolean;
     export let hasPrev: boolean;
     export let hasNext: boolean;
-
-    const dispatch = createEventDispatcher<{ toggleColor: void }>();
-
-    let showTools = false;
+    export let showTools: boolean;
 </script>
 
 <div class="controls">
-    <div class="btn shuffle">
+    <div class="btn shuffle" on:click={() => dispatch( 'shuffle' )}>
         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
         <span>Shuffle</span>
     </div>
@@ -24,7 +22,7 @@ import { createEventDispatcher } from "svelte";
         {/if}
         <span>Color</span>
     </div>
-    <div class="btn tools">
+    <div class="btn tools" on:click={() => dispatch( 'toggleTools' )}>
         {#if showTools}
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
         {:else}
@@ -32,11 +30,11 @@ import { createEventDispatcher } from "svelte";
         {/if}
         <span>Tools</span>
     </div>
-    <div class="btn prev" class:inactive={!hasPrev}>
+    <div class="btn prev" class:inactive={!hasPrev} on:click={() => hasPrev && dispatch( 'nav', -1 )}>
         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
         <span>Previous</span>
     </div>
-    <div class="btn next" class:inactive={!hasNext}>
+    <div class="btn next" class:inactive={!hasNext} on:click={() => hasNext && dispatch( 'nav', 1 )}>
         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
         <span>Next</span>
     </div>
@@ -54,7 +52,7 @@ import { createEventDispatcher } from "svelte";
         justify-content: center;
         align-items: stretch;
 
-        height: 110px;
+        height: var( --ctrl-height );
         background: var( --panel-bg );
 
         transition: background-color .5s;
@@ -76,39 +74,38 @@ import { createEventDispatcher } from "svelte";
     .controls > div > svg {
         width: 48px;
         height: 48px;
-        fill: var( --btn-fg );
+        fill: var( --ctrl-btn-fg );
 
         transition: fill .5s;
     }
     .controls > div > span {
-        margin: 5px 0 0;
-        font-size: 10px;
+        margin: .5rem 0 0;
+        font-size: var( --fs-sm );
         font-weight: bold;
         text-transform: uppercase;
 
-        color: var( --btn-fg );
+        color: var( --ctrl-btn-fg );
 
         transition: color .5s;
     }
 
     .controls > div:hover {
         cursor: pointer;
-        background: var( --btn-hover-bg );
+        background: var( --ctrl-btn-hover-bg );
     }
     .controls > div:hover > svg,
     .controls > div:hover > span {
-        fill: var( --btn-hover-fg );
-        color: var( --btn-hover-fg );
+        fill: var( --ctrl-btn-hover-fg );
+        color: var( --ctrl-btn-hover-fg );
     }
 
-    .controls > div.inactive,
-    .controls.dark > div.inactive {
+    .controls > div.inactive {
         cursor: default;
         background: transparent;
     }
     .controls > div.inactive > svg,
     .controls > div.inactive > span {
-        fill: var( --btn-inactive-fg );
-        color: var( --btn-inactive-fg );
+        fill: var( --ctrl-btn-inactive-fg );
+        color: var( --ctrl-btn-inactive-fg );
     }
 </style>
