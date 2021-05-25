@@ -43,13 +43,13 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.7",
+    "@types/seedrandom": "^3.0.0",
     "svelte": "^3.37.0",
     "svelte-preprocess": "^4.7.2",
     "typescript": "^4.2.4",
     "vite": "^2.3.3"
   },
   "dependencies": {
-    "@types/seedrandom": "^3.0.0",
     "seedrandom": "^3.0.5"
   }
 }
