@@ -1,6 +1,6 @@
 # SvgPlant Changelog
 
-## 2.0.4 - 2021-05-25
+## 2.0.5 - 2021-05-25
 
 - switched to vite for building
 - recreated the demo app in svelte
