@@ -8,6 +8,7 @@
   "files": ["dist"],
   "main": "./dist/svg-plant.umd.js",
   "module": "./dist/svg-plant.es.js",
+  "types": "./dist/types/main.d.ts",
   "exports": {
     ".": {
       "import": "./dist/svg-plant.es.js",
