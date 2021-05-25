@@ -7,7 +7,7 @@
 
 A library that lets you generate images of different types of plants as svg elements.
 
-[Demo](https://todo)
+[Demo](https://svg-plant.surge.sh)
 
 
 ## Install
@@ -21,7 +21,7 @@ npm install --save svg-plant
 Load with script tag:
 
 ```html
-<script src="https://unpkg.com/svg-plant@latest/dist/svg-plant.min.umd.js"></script>
+<script src="https://unpkg.com/svg-plant@latest/dist/svg-plant.umd.js"></script>
 ```
 
 

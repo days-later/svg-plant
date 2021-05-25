@@ -2,36 +2,25 @@
     import './vars.css';
     import './app.css';
     import { onMount } from 'svelte';
-    import favicon from './assets/favicon.ico';
     import Controls from './components/Controls.svelte';
     import Tools from './components/Tools.svelte';
     import Plant from './components/Plant.svelte';
     import { getRandomColor } from './lib/util';
     import { Genera } from '../lib/main';
+    import { Cfg, initialCfg, seeds } from './lib/Cfg';
 
-    let seed = (Math.random() + '').substring( 2 );
-    let color = true;
-    let fill = '';
     let showTools = false;
 
-    let generaKeys = Object.keys( Genera );
-    let generaIndex = 0;
-    $: hasPrev = generaIndex > 0;
-    $: hasNext = generaIndex < generaKeys.length - 1;
-    $: genus = Genera[ generaKeys[ generaIndex ] as keyof typeof Genera ];
+    let generaKeys = Object.keys( Genera ) as (keyof typeof Genera)[];
+    let generaIndex = generaKeys.findIndex( id => id === initialCfg.genus );
+    if (generaIndex < 0) generaIndex = 0;
 
-    let getSvg: () => string;
-
-    function setSeed( _seed?: string ) {
-        seed = _seed ? _seed : (Math.random() + '').substring( 2 );
-    }
-    function toggleColor() {
-        color = !color;
+    const unsubColor = Cfg.color.subscribe( color => {
         if (color) document.documentElement.classList.remove( 'dark' );
         else document.documentElement.classList.add( 'dark' );
 
-        fill = color ? '' : getRandomColor();
-    }
+        Cfg.fill.set( color ? '' : getRandomColor() );
+    });
 
     let plantEl: HTMLElement;
     async function animatePlantWrapper( isIn: boolean, from: string, to: string, ms: number ) {
@@ -44,40 +33,44 @@
         const i = generaIndex + dir;
         if (i < 0 || i > generaKeys.length - 1) return;
 
-        await animatePlantWrapper( false, '0', dir>0 ? '-100%' : '100%', 600 );
+        console.log( plantEl.offsetLeft );
+
+        await animatePlantWrapper( false, '0', dir>0 ? '-100%' : '100%', 400 );
 
         generaIndex = i;
+        const genusID = generaKeys[ generaIndex ];
+        if (!(genusID in seeds)) seeds[ genusID ] = '';
+        Cfg.plant.set({
+            seed: seeds[ genusID ],
+            genus: genusID,
+        });
 
-        await animatePlantWrapper( true, dir>0 ? '100%' : '-100%', '0', 600 );
+        await animatePlantWrapper( true, dir>0 ? '100%' : '-100%', '0', 400 );
     }
 
     onMount(() => {
-        if (!color) {
-            color = true;
-            toggleColor();
+        return () => {
+            unsubColor();
         }
     });
 </script>
 
-<svelte:head>
-    <link rel="icon" href={favicon} />
-</svelte:head>
-
 <div class="plant-wrapper" bind:this={plantEl} on:mousedown={() => showTools = false}>
-    <Plant {seed} {genus} {fill} bind:getSvg />
+    <Plant />
 </div>
 
 <Controls
-    {color} {hasPrev} {hasNext} {showTools}
+    hasPrev={generaIndex > 0}
+    hasNext={generaIndex < generaKeys.length - 1}
 
-    on:shuffle={() => setSeed()}
-    on:toggleColor={toggleColor}
+    {showTools}
+
     on:toggleTools={() => showTools = !showTools}
     on:nav={e => nav( e.detail )}
 />
 
 {#if showTools}
-    <Tools genusName={genus.genusName} {seed} {getSvg} on:setSeed={e => setSeed( e.detail )} />
+    <Tools />
 {/if}
 
 <style>

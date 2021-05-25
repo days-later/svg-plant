@@ -1,26 +1,17 @@
 <script lang="ts">
+    import { Cfg, genusName, svgPlant } from '../lib/Cfg';
     import { fly } from 'svelte/transition';
-    import { createEventDispatcher } from "svelte";
+    import { copyToClipboard } from '../lib/util';
 
-    const dispatch = createEventDispatcher<{ setSeed: string }>();
-
-    export let genusName: string;
-    export let seed: string;
-    export let getSvg: () => string;
+    const plantCfg = Cfg.plant;
 
     let newSeed = '';
-    function set() {
-        dispatch( 'setSeed', newSeed );
+    function setSeed() {
+        Cfg.plant.set({
+            seed: newSeed,
+            genus: $plantCfg.genus,
+        });
         newSeed = '';
-    }
-
-    function copyToClipboard( text: string ) {
-        const i = document.createElement( 'textarea' );
-        i.innerText = text;
-        document.body.appendChild( i );
-        i.select();
-        document.execCommand("copy");
-        i.remove();
     }
 </script>
 
@@ -28,19 +19,19 @@
     <div>
         <div>
             <span class="label">Genus</span>
-            <span class="value">{genusName}</span>
+            <span class="value">{$genusName}</span>
         </div>
         <div>
             <span class="label">Seed</span>
-            <span class="value">{seed}</span>
-            <span class="btn copy-seed" on:click={() => copyToClipboard( seed )}>copy</span>
+            <span class="value">{$plantCfg.seed}</span>
+            <span class="btn copy-seed" on:click={() => copyToClipboard( $plantCfg.seed )}>copy</span>
         </div>
         <div>
             <input type="text" name="seed" id="seed-input" bind:value={newSeed}>
-            <span class="btn set-seed" on:click={set}>set seed</span>
+            <span class="btn set-seed" on:click={setSeed}>set seed</span>
         </div>
         <div>
-            <span class="btn copy-svg" on:click={() => copyToClipboard( getSvg() )}>copy svg to clipboard</span>
+            <span class="btn copy-svg" on:click={() => copyToClipboard( $svgPlant.svgElement.outerHTML )}>copy svg to clipboard</span>
         </div>
     </div>
 </div>

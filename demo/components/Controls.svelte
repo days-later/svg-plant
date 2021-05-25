@@ -1,21 +1,32 @@
 <script lang="ts">
+    import { Cfg } from "../lib/Cfg";
     import { createEventDispatcher } from "svelte";
+    import { get } from "svelte/store";
 
-    const dispatch = createEventDispatcher<{ shuffle: void, toggleColor: void, toggleTools: void, nav: number }>();
+    const dispatch = createEventDispatcher<{ toggleTools: void, nav: number }>();
 
-    export let color: boolean;
     export let hasPrev: boolean;
     export let hasNext: boolean;
     export let showTools: boolean;
+
+    const color = Cfg.color;
+
+    function shuffleSeed() {
+        const plantCfg = get( Cfg.plant );
+        Cfg.plant.set({
+            seed: (Math.random() + '').substring( 2 ),
+            genus: plantCfg.genus,
+        });
+    }
 </script>
 
 <div class="controls">
-    <div class="btn shuffle" on:click={() => dispatch( 'shuffle' )}>
+    <div class="btn shuffle" on:click={shuffleSeed}>
         <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
         <span>Shuffle</span>
     </div>
-    <div class="btn color" on:click={() => dispatch( 'toggleColor' )}>
-        {#if color}
+    <div class="btn color" on:click={() => color.set( !$color )}>
+        {#if $color}
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
         {:else}
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>

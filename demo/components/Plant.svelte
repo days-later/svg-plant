@@ -1,21 +1,30 @@
 <script lang="ts">
-    import { plantAction } from '../lib/plantAction';
-    import { SvgPlant } from '../../lib/main';
-    import type { GenusConstructor } from '../../lib/types';
+    import { onMount } from 'svelte';
+    import { Cfg, svgPlant, svgPlantUpdate } from '../lib/Cfg';
 
-    export let seed: string;
-    export let genus: GenusConstructor;
-    export let fill: string;
+    const fill = Cfg.fill;
 
-    $: svgPlant = new SvgPlant( new genus( seed ), { color: !fill } );
+    let el: HTMLElement;
 
-    export function getSvg() {
-        return svgPlant.svgElement.outerHTML;
-    }
+    onMount(() => {
+        const unsubSvgPlant = svgPlant.subscribe( plant => {
+            el.innerHTML = '';
+            el.appendChild( plant.svgElement );
+        });
+        const unsubSvgPlantUpdate = svgPlantUpdate.subscribe( ({ regrow }) => {
+            if (regrow) {
+                $svgPlant.animate( 0, 1, 1000 );
+            }
+        });
 
+        return () => {
+            unsubSvgPlant();
+            unsubSvgPlantUpdate();
+        }
+    });
 </script>
 
-<div class="plant" style="--fill: {fill};" use:plantAction={{ svgPlant }}></div>
+<div class="plant" style="--fill: {$fill};" bind:this={el}></div>
 
 <style>
     .plant {

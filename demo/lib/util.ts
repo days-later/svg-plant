@@ -31,3 +31,12 @@ function hsl2rgb( h: number, s: number, l: number ) {
 export function getRandomColor() {
     return hsl2rgb( Math.random() * 360, .5, .8 );
 }
+
+export function copyToClipboard( text: string ) {
+    const i = document.createElement( 'textarea' );
+    i.innerText = text;
+    document.body.appendChild( i );
+    i.select();
+    document.execCommand("copy");
+    i.remove();
+}

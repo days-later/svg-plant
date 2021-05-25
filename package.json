@@ -1,6 +1,6 @@
 {
   "name": "svg-plant",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "procedurally generated svg graphic of a houseplant",
   "author": "fridtjof@gmail.com",
   "license": "MIT",
@@ -36,7 +36,8 @@
     "type-check": "tsc --project lib --noEmit --emitDeclarationOnly false",
     "type-export": "tsc --project lib",
     "dev": "vite",
-    "build": "npm run type-check && vite build && npm run type-export",
+    "build:lib": "npm run type-check && vite build --config vite.lib.config.js && npm run type-export",
+    "build:demo": "vite build --config vite.config.js",
     "serve": "vite preview"
   },
   "devDependencies": {

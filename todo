@@ -1,3 +1,5 @@
+- nav spam clicking
+
 - make SvgPlant.body.genus.genusName accessible on SvgPlant
 - provide way to start an animation with a start date and a duration
     - pick up animations after reload
