@@ -3,6 +3,9 @@ import type { rngSeed, attributeSet, leafCurvesHandles, leafDefinition, Genus } 
 
 class BaseGenus implements Genus {
 
+    static genusName = 'base';
+    get genusName() { return this.constructor.prototype.genusName; }
+
     rng: rng;
     width: number;
     height: number;
@@ -38,14 +41,6 @@ class BaseGenus implements Genus {
         };
     }
 
-    static get genusName(): string {
-        const cn = this.name;
-        return cn.substring( 0, cn.length - 5 );
-    }
-    get genusName(): string {
-        const cn = this.constructor.name;
-        return cn.substring( 0, cn.length - 5 );
-    }
     get rngSeed(): string {
         return this.rng.seed;
     }

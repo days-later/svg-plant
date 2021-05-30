@@ -4,6 +4,8 @@ import type { Genus, rngSeed, attributeSet } from '../types';
 
 class PileaGenus extends BaseGenus implements Genus {
 
+    static genusName = 'Pilea';
+
     offshootSegmentStyle: attributeSet;
     branchSegmentStyle: attributeSet;
 

@@ -83,8 +83,14 @@
 
         width: 100%;
 
-        padding: 2rem 2rem 0;
+        padding: 1rem 0 0;
 
         overflow: hidden;
+    }
+    @media (max-width: 450px) {
+        .plant-wrapper {
+            width: 130%;
+            margin-left: -15%;
+        }
     }
 </style>

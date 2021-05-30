@@ -2,6 +2,7 @@
     import { Cfg, genusName, svgPlant } from '../lib/Cfg';
     import { fly } from 'svelte/transition';
     import { copyToClipboard } from '../lib/util';
+    import { isMobile } from '../lib/mediaQuery';
 
     const plantCfg = Cfg.plant;
 
@@ -15,7 +16,7 @@
     }
 </script>
 
-<div class="tools" transition:fly={{ duration: 600, y: 200 }}>
+<div class="tools" transition:fly={{ duration: 600, y: 200 * ($isMobile ? -1 : 1) }}>
     <div>
         <div>
             <span class="label">Genus</span>
@@ -133,5 +134,16 @@
         cursor: pointer;
         color: var( --btn-hover-fg );
         background: var( --btn-hover-bg );
+    }
+
+    @media (max-width: 450px) {
+        .tools {
+            top: -3px;
+            bottom: auto;
+        }
+        .tools > div {
+            border-top: 6px dotted var( --bg );
+            border-bottom: 0;
+        }
     }
 </style>

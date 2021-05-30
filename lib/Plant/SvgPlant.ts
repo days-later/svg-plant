@@ -63,6 +63,10 @@ class SvgPlant {
         this.animation = null;
     }
 
+    get genusName(): string {
+        return this.body.genus.genusName;
+    }
+
     get seed(): string {
         return this.body.genus.rngSeed;
     }

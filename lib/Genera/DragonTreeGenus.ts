@@ -4,6 +4,8 @@ import type { Genus, rngSeed, leafDefinition } from '../types';
 
 class DragonTreeGenus extends BaseGenus implements Genus {
 
+    static genusName = 'DragonTree';
+
     constructor( rngSeed?: rngSeed ) {
         super( rngSeed );
 

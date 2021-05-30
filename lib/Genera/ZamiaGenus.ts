@@ -4,6 +4,8 @@ import type { Genus, rngSeed } from '../types';
 
 class ZamiaGenus extends BaseGenus implements Genus {
 
+    static genusName = 'Zamia';
+
     constructor( rngSeed?: rngSeed ) {
         super( rngSeed );
 

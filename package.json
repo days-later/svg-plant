@@ -5,7 +5,9 @@
   "author": "fridtjof@gmail.com",
   "license": "MIT",
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/svg-plant.umd.js",
   "module": "./dist/svg-plant.es.js",
   "types": "./dist/types/main.d.ts",
@@ -32,22 +34,22 @@
     "url": "https://github.com/days-later/svg-plant/issues",
     "email": "fridtjof@gmail.com"
   },
-
   "scripts": {
     "type-check": "tsc --project lib --noEmit --emitDeclarationOnly false",
     "type-export": "tsc --project lib",
     "dev": "vite",
     "build:lib": "npm run type-check && vite build --config vite.lib.config.js && npm run type-export",
     "build:demo": "vite build --config vite.config.js",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "deploy:demo": "npm run build:demo && surge demoDist"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.7",
     "@types/seedrandom": "^3.0.0",
     "svelte": "^3.37.0",
     "svelte-preprocess": "^4.7.2",
-    "typescript": "^4.2.4",
-    "vite": "^2.3.3"
+    "typescript": "^4.3.2",
+    "vite": "^2.3.4"
   },
   "dependencies": {
     "seedrandom": "^3.0.5"

@@ -4,6 +4,8 @@ import type { rngSeed, Genus, leafDefinition } from '../types';
 
 class BushyPlantGenus extends BaseGenus implements Genus {
 
+    static genusName = 'BushyPlant';
+
     constructor( rngSeed?: rngSeed ) {
         super( rngSeed );
 

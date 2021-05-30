@@ -11,6 +11,7 @@ html {
 body {
     display: flex;
     flex-direction: column;
+    width: 100vw;
     height: 100%;
     margin: 0;
     padding: 0;
@@ -20,26 +21,9 @@ body {
     background: var( --bg );
 }
 
-#plant {
-    position: relative;
-    height: calc(100% - 130px);
-    margin: 20px 20px 0;
-    overflow: hidden;
-}
-#plant > svg {
+#app {
     position: absolute;
-    top: 0;
-    left: 110%;
-    width: 100%;
+    width: 100vw;
     height: 100%;
-    transition: fill .5s, left 1s;
-}
-#plant > svg.center {
-    left: 0;
-}
-#plant > svg.left {
-    left: -110%;
-}
-#plant > svg.right {
-    left: 110%;
+    overflow: hidden;
 }
