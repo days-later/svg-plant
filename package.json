@@ -40,8 +40,7 @@
     "dev": "vite",
     "build:lib": "npm run type-check && vite build --config vite.lib.config.js && npm run type-export",
     "build:demo": "vite build --config vite.config.js",
-    "serve": "vite preview",
-    "deploy:demo": "npm run build:demo && surge demoDist"
+    "serve": "vite preview"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.7",

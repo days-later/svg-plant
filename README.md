@@ -7,7 +7,7 @@
 
 A library that lets you generate images of different types of plants as svg elements.
 
-[Demo](https://svg-plant.surge.sh)
+[Demo](https://svg-plant.vercel.app/)
 
 
 ## Install
