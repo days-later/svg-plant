@@ -7,7 +7,8 @@
     import Plant from './components/Plant.svelte';
     import { getRandomColor } from './lib/util';
     import { Genera } from '../lib/main';
-    import { Cfg, initialCfg, seeds } from './lib/Cfg';
+    import { Cfg, initialCfg, seeds, svgPlant } from './lib/Cfg';
+    import { trackPointerPosition } from './lib/trackPointerPosition';
 
     let showTools = false;
 
@@ -48,6 +49,12 @@
         await animatePlantWrapper( true, dir>0 ? '100%' : '-100%', '0', 400 );
     }
 
+    const pad = .15;
+    function onDrag({ y }: { y: number }) {
+        const p = $svgPlant;
+        p.age = 1 - (y < pad ? 0 : y > (1-pad) ? 1 : (y-pad) / (1 - 2*pad));
+    }
+
     onMount(() => {
         return () => {
             unsubColor();
@@ -55,7 +62,7 @@
     });
 </script>
 
-<div class="plant-wrapper" bind:this={plantEl} on:mousedown={() => showTools = false}>
+<div class="plant-wrapper" bind:this={plantEl} on:mousedown={() => showTools = false} use:trackPointerPosition={{ callback: onDrag }}>
     <Plant />
 </div>
 

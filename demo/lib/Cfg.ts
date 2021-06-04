@@ -14,7 +14,6 @@ export const initialCfg = {
     genus: cfg.genus && cfg.genus in Genera ? cfg.genus : generaKeys[ 0 ],
     color: cfg.color ?? true,
     fill: '',
-    age: cfg.age ?? 1,
 };
 
 export const seeds: Record<GenusID,string> = cfg.seeds || {};
@@ -23,7 +22,6 @@ export const Cfg = {
     plant: writable<PlantCfg>({ seed: initialCfg.seed, genus: initialCfg.genus }),
     color: writable<boolean>( initialCfg.color ),
     fill: writable<string>( initialCfg.fill ),
-    age: writable<number>( initialCfg.age ),
 };
 
 Cfg.plant.subscribe( cfg => {
@@ -34,14 +32,12 @@ type CfgData = {
     seeds: Record<GenusID,string>,
     genus: GenusID,
     color: boolean,
-    age: number,
 };
-const onChange = derived<[ typeof Cfg.plant, typeof Cfg.color, typeof Cfg.age ], CfgData>( [ Cfg.plant, Cfg.color, Cfg.age ], data => {
+const onChange = derived<[ typeof Cfg.plant, typeof Cfg.color ], CfgData>( [ Cfg.plant, Cfg.color ], data => {
     return {
         seeds,
         genus: data[ 0 ].genus,
         color: data[ 1 ],
-        age: data[ 2 ],
     };
 });
 onChange.subscribe( data => localStorage.setItem( lsKey, JSON.stringify( data ) ) );
