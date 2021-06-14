@@ -1,7 +1,7 @@
-import { SvgPlant, Genera } from '../../lib/main';
+import { SvgPlant, Genera, GenusID } from '../../lib/main';
+/*
 import { derived, writable } from 'svelte/store';
 
-type GenusID = keyof typeof Genera;
 type PlantCfg = { seed: string, genus: GenusID };
 
 let generaKeys = Object.keys( Genera ) as GenusID[];
@@ -16,17 +16,11 @@ export const initialCfg = {
     fill: '',
 };
 
-export const seeds: Record<GenusID,string> = cfg.seeds || {};
-
 export const Cfg = {
     plant: writable<PlantCfg>({ seed: initialCfg.seed, genus: initialCfg.genus }),
     color: writable<boolean>( initialCfg.color ),
     fill: writable<string>( initialCfg.fill ),
 };
-
-Cfg.plant.subscribe( cfg => {
-    seeds[ cfg.genus ] = cfg.seed;
-});
 
 type CfgData = {
     seeds: Record<GenusID,string>,
@@ -64,3 +58,4 @@ export const svgPlantUpdate = derived<[ typeof Cfg.plant, typeof Cfg.color ], { 
     prevPlantCfg = plantCfg;
     return { regrow };
 });
+*/

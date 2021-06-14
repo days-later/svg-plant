@@ -15,6 +15,8 @@ const Genera = {
     'Pilea': PileaGenus,
 };
 
+export type GenusID = keyof typeof Genera;
+
 export {
     SvgPlant,
     Genera,

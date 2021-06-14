@@ -1,44 +1,59 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { Cfg, svgPlant, svgPlantUpdate } from '../lib/Cfg';
+    import type { Readable } from 'svelte/store';
+    import type { SvgPlant } from 'lib/main';
+    import { color } from '../lib/stores/color';
+    import { pos } from '../lib/stores/pos';
 
-    const fill = Cfg.fill;
+    export let plant: Readable<SvgPlant>;
+    export let age: number;
+    export let fill: string;
 
     let el: HTMLElement;
+    let init = true;
 
-    onMount(() => {
-        const unsubSvgPlant = svgPlant.subscribe( plant => {
-            el.innerHTML = '';
-            el.appendChild( plant.svgElement );
-        });
-        const unsubSvgPlantUpdate = svgPlantUpdate.subscribe( ({ regrow }) => {
-            if (regrow) {
-                $svgPlant.animate( 0, 1, 1000 );
-            }
-        });
+    $: $plant.setColor( $color )
 
-        return () => {
-            unsubSvgPlant();
-            unsubSvgPlantUpdate();
-        }
-    });
+    $: isSelected = $pos === $plant.genusName;
+    $: if (isSelected) { $plant.setAge( age ); }
+    $: if (isSelected && $plant.age !== 1) { $plant.setAge( 1 ); }
+
+    function updatePlant() {
+        el.innerHTML = '';
+        el.appendChild( $plant.svgElement );
+
+        if (init) init = false;
+        else $plant.animate( 0, 1, 1000 );
+    }
+    $: if ($plant && el) updatePlant();
 </script>
 
-<div class="plant" style="--fill: {$fill};" bind:this={el}></div>
+<div
+    class="plant"
+    style="--fill: {fill};"
+    bind:this={el}
+/>
 
 <style>
     .plant {
         position: relative;
+        flex: 0 0 100%;
         width: 100%;
         height: 100%;
+
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+
+        scroll-snap-align: center;
     }
 
     .plant :global( svg ) {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 5vh;
+        left: 5vw;
+        width: calc( 100% - 10vw );
+        height: calc( 100% - 5vh );
         transition: fill .5s, left 1s;
 
         fill: var( --fill );

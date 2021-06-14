@@ -1,5 +1,12 @@
+
+- switch next/prev to scroll snap
 - nav spam clicking
+
+- separate pot / plant
+
+- option for plant to be centered in svg
 
 - provide way to start an animation with a start date and a duration
     - pick up animations after reload
-- option for plant to be centered in svg
+        - use async Storage interface, have storage argument (could pass localforage / custom)
+    - separate plant / animation

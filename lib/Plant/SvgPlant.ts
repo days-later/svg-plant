@@ -48,10 +48,10 @@ class SvgPlant {
         };
 
         if (typeof cfg == 'object') {
-            if (cfg.color !== undefined) this.color = cfg.color;
-            if (cfg.age !== undefined) this.age = cfg.age;
-            if (cfg.potSize !== undefined) this.potSize = cfg.potSize;
-            if (cfg.potPathAttr !== undefined) this.potPathAttr = cfg.potPathAttr;
+            if (cfg.color !== undefined) this.setColor( cfg.color );
+            if (cfg.age !== undefined) this.setAge( cfg.age );
+            if (cfg.potSize !== undefined) this.setPotSize( cfg.potSize );
+            if (cfg.potPathAttr !== undefined) this.setPotPathAttr( cfg.potPathAttr );
         }
 
         this.body = new PlantBody( genus );
@@ -72,7 +72,7 @@ class SvgPlant {
     }
 
     get color(): boolean { return this.cfg.color; }
-    set color( v: boolean ) {
+    setColor( v: boolean ) {
         v = !!v;
         if (v != this.cfg.color) {
             this.cfg.color = v;
@@ -81,7 +81,7 @@ class SvgPlant {
     }
 
     get age(): number { return this.cfg.age; }
-    set age( v: number ) {
+    setAge( v: number ) {
         v = Math.max( 0, Math.min( v, 1 ));
         if (v != this.cfg.age) {
             this.cfg.age = v;
@@ -90,7 +90,7 @@ class SvgPlant {
     }
 
     get potSize(): number { return this.cfg.potSize; }
-    set potSize( v: number ) {
+    setPotSize( v: number ) {
         v = Math.max( 0, Math.min( v, 1 ));
         if (v != this.cfg.potSize) {
             this.cfg.potSize = v;
@@ -99,7 +99,7 @@ class SvgPlant {
     }
 
     get potPathAttr(): attributeSet { return this.cfg.potPathAttr; }
-    set potPathAttr( v: attributeSet ) {
+    setPotPathAttr( v: attributeSet ) {
         if (v !== this.cfg.potPathAttr) {
             this.cfg.potPathAttr = v;
             this.update( false, true );
@@ -251,7 +251,7 @@ class SvgPlant {
         if (!a || !a.paused) return;
         a.paused = false;
 
-        this.age = a.currentAge;
+        this.setAge( a.currentAge );
 
         const acl = (t: number): number => t<0 ? 0 : t>1 ? 1 : Math.sin( (t - .5) * Math.PI ) * .5 + .5;
         const aclInv = (t: number): number => t<0 ? 0 : t>1 ? 1 : Math.asin( t * 2 - 1 ) / Math.PI + .5;
@@ -276,7 +276,7 @@ class SvgPlant {
                     a.nextAnimationFrame = requestAnimationFrame( upd );
                 }
                 else {
-                    this.age = a.toAge;
+                    this.setAge( a.toAge );
                     this.animation = null;
                 }
             }

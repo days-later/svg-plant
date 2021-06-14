@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { Cfg } from "../lib/Cfg";
+    import { color } from "./../lib/stores/color";
     import { createEventDispatcher } from "svelte";
-    import { get } from "svelte/store";
 
     const dispatch = createEventDispatcher<{ toggleTools: void, nav: number }>();
 
@@ -9,14 +8,8 @@
     export let hasNext: boolean;
     export let showTools: boolean;
 
-    const color = Cfg.color;
-
     function shuffleSeed() {
-        const plantCfg = get( Cfg.plant );
-        Cfg.plant.set({
-            seed: (Math.random() + '').substring( 2 ),
-            genus: plantCfg.genus,
-        });
+
     }
 </script>
 

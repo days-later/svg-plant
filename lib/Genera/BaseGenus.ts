@@ -4,7 +4,7 @@ import type { rngSeed, attributeSet, leafCurvesHandles, leafDefinition, Genus } 
 class BaseGenus implements Genus {
 
     static genusName = 'base';
-    get genusName() { return this.constructor.prototype.genusName; }
+    get genusName() { return (this.constructor as typeof BaseGenus).genusName; }
 
     rng: rng;
     width: number;
