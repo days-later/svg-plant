@@ -32,9 +32,9 @@ export function getRandomColor() {
     return hsl2rgb( Math.random() * 360, .5, .8 );
 }
 
-export function copyToClipboard( text: string ) {
+export function copyToClipboard( text: string | number ) {
     const i = document.createElement( 'textarea' );
-    i.innerText = text;
+    i.innerText = text + '';
     document.body.appendChild( i );
     i.select();
     document.execCommand("copy");

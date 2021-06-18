@@ -3,6 +3,7 @@
     import './app.css';
     import { onMount } from 'svelte';
     import Controls from './components/Controls.svelte';
+    import Tools from './components/Tools.svelte';
     import { getRandomColor } from './lib/util';
     import { Genera } from '../lib/main';
     import { color } from './lib/stores/color';
@@ -32,12 +33,22 @@
         if (i < 0 || i > generaKeys.length - 1) return;
 
         generaIndex = i;
-        pos.set( generaKeys[ generaIndex ] );
-
         goto( generaIndex );
     }
     function goto( i: number, smooth = true ) {
         slidesEl.scrollTo({ top: 0, left: i * slidesEl.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    let scrollTo: number;
+    function onScroll() {
+        clearTimeout( scrollTo );
+        scrollTo = window.setTimeout(() => {
+
+            generaIndex = Math.round( slidesEl.scrollLeft / slidesEl.clientWidth );
+            age = 1;
+            pos.set( generaKeys[ generaIndex ] );
+
+        }, 100 );
     }
 
     const pad = .15;
@@ -54,7 +65,7 @@
     });
 </script>
 
-<div class="slides" bind:this={slidesEl} on:mousedown={() => showTools = false} use:trackPointerPosition={{ callback: onDrag }}>
+<div class="slides" bind:this={slidesEl} on:mousedown={() => showTools = false} use:trackPointerPosition={{ callback: onDrag }} on:scroll={onScroll}>
     {#each generaKeys as g}
         <Plant {age} {fill} plant={plants[ g ]} />
     {/each}
@@ -70,22 +81,11 @@
     on:nav={e => nav( e.detail )}
 />
 
-<!--
 {#if showTools}
-    <Tools />
+    <Tools on:close={() => showTools = false} />
 {/if}
--->
 
 <style>
-    /* TODO - inside Plant.svelte i guess
-    @media (max-width: 450px) {
-        .plant-wrapper {
-            width: 130%;
-            margin-left: -15%;
-        }
-    }
-    */
-
     .slides {
         position: absolute;
         z-index: 1;
@@ -101,30 +101,8 @@
         width: 100%;
 
         overflow: hidden;
-        overflow-x: scroll;
 
         scrollbar-width: none;
-
         scroll-snap-type: x mandatory;
-    }
-    .slides::-webkit-scrollbar {
-        height: 1rem;
-        background: #aaa;
-    }
-    .slides::-webkit-scrollbar-thumb {
-        background: #555;
-    }
-
-    .slides > div {
-        flex: 0 0 100%;
-        width: 100%;
-        height: 100%;
-
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: center;
-        align-items: center;
-
-        scroll-snap-align: center;
     }
 </style>

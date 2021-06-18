@@ -1,6 +1,8 @@
 <script lang="ts">
     import { color } from "./../lib/stores/color";
     import { createEventDispatcher } from "svelte";
+    import { seeds } from "../lib/stores/seeds";
+    import { pos } from "../lib/stores/pos";
 
     const dispatch = createEventDispatcher<{ toggleTools: void, nav: number }>();
 
@@ -9,7 +11,7 @@
     export let showTools: boolean;
 
     function shuffleSeed() {
-
+        seeds[ $pos ].set( (Math.random()+'').substring( 2 ) );
     }
 </script>
 

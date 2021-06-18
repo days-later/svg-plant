@@ -1,38 +1,41 @@
 <script lang="ts">
-    import { Cfg, genusName, svgPlant } from '../lib/Cfg';
     import { fly } from 'svelte/transition';
+    import { createEventDispatcher } from 'svelte';
     import { copyToClipboard } from '../lib/util';
     import { isMobile } from '../lib/mediaQuery';
+    import { seeds } from '../lib/stores/seeds';
+    import { pos } from '../lib/stores/pos';
+    import { plants } from '../lib/stores/plants';
 
-    const plantCfg = Cfg.plant;
+    const dispatch = createEventDispatcher<{ close: void }>();
+
+    $: currentSeed = seeds[ $pos ];
+    $: currentPlant = plants[ $pos ];
 
     let newSeed = '';
     function setSeed() {
-        Cfg.plant.set({
-            seed: newSeed,
-            genus: $plantCfg.genus,
-        });
+        currentSeed.set( newSeed );
         newSeed = '';
     }
 </script>
 
-<div class="tools" transition:fly={{ duration: 600, y: 200 * ($isMobile ? -1 : 1) }}>
+<div class="tools" transition:fly={{ duration: 600, y: 200 * ($isMobile ? -1 : 1) }} on:click|self={() => dispatch( 'close' )}>
     <div>
         <div>
             <span class="label">Genus</span>
-            <span class="value">{$genusName}</span>
+            <span class="value">{$pos}</span>
         </div>
         <div>
             <span class="label">Seed</span>
-            <span class="value">{$plantCfg.seed}</span>
-            <span class="btn copy-seed" on:click={() => copyToClipboard( $plantCfg.seed )}>copy</span>
+            <span class="value">{$currentSeed}</span>
+            <span class="btn copy-seed" on:click={() => copyToClipboard( $currentSeed )}>copy</span>
         </div>
         <div>
             <input type="text" name="seed" id="seed-input" bind:value={newSeed}>
             <span class="btn set-seed" on:click={setSeed}>set seed</span>
         </div>
         <div>
-            <span class="btn copy-svg" on:click={() => copyToClipboard( $svgPlant.svgElement.outerHTML )}>copy svg to clipboard</span>
+            <span class="btn copy-svg" on:click={() => copyToClipboard( $currentPlant.svgElement.outerHTML )}>copy svg to clipboard</span>
         </div>
     </div>
 </div>
@@ -40,22 +43,24 @@
 <style>
     .tools {
         position: absolute;
+        top: 0;
         left: 0;
-        right: 0;
         bottom: var( --ctrl-height );
+        right: 0;
+
         z-index: 9;
 
-        pointer-events: none;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-end;
+        align-items: center;
     }
 
     .tools > div {
         width: 600px;
         max-width: 100%;
         max-height: calc(100vh - 110px);
-        margin: 0 auto;
         padding: 1rem;
-
-        pointer-events: all;
 
         overflow: hidden;
         overflow-y: auto;
@@ -139,7 +144,7 @@
     @media (max-width: 450px) {
         .tools {
             top: -3px;
-            bottom: auto;
+            justify-content: flex-start;
         }
         .tools > div {
             border-top: 6px dotted var( --bg );

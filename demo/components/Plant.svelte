@@ -13,9 +13,12 @@
 
     $: $plant.setColor( $color )
 
-    $: isSelected = $pos === $plant.genusName;
-    $: if (isSelected) { $plant.setAge( age ); }
-    $: if (isSelected && $plant.age !== 1) { $plant.setAge( 1 ); }
+    $: if ($pos === $plant.genusName) {
+        $plant.setAge( age );
+    }
+    else if ($plant.age < 1) {
+        $plant.animate( $plant.age, 1, 1000 );
+    }
 
     function updatePlant() {
         el.innerHTML = '';
@@ -29,7 +32,7 @@
 
 <div
     class="plant"
-    style="--fill: {fill};"
+    style="--fill: {fill || ''};"
     bind:this={el}
 />
 
@@ -39,6 +42,7 @@
         flex: 0 0 100%;
         width: 100%;
         height: 100%;
+        margin: 0;
 
         display: flex;
         flex-flow: row nowrap;
@@ -57,5 +61,12 @@
         transition: fill .5s, left 1s;
 
         fill: var( --fill );
+    }
+
+    @media (max-width: 450px) {
+        .plant {
+            transform: scale( 1.5 );
+            transform-origin: center bottom;
+        }
     }
 </style>
